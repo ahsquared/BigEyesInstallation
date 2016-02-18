@@ -122,6 +122,7 @@
     <Compile Include="Assets\OSC simpl\Examples\09 Optimisations\Optimisations.cs" />
     <Compile Include="Assets\OSC simpl\OscIn.cs" />
     <Compile Include="Assets\OSC simpl\OscOut.cs" />
+    <Compile Include="Assets\OSCBodyController.cs" />
     <Compile Include="Assets\Scripts\ControlSelector.cs" />
     <Compile Include="Assets\Scripts\DoughController.cs" />
     <Compile Include="Assets\Scripts\OSCController.cs" />

@@ -221,16 +221,10 @@ public class BodySourceView : MonoBehaviour
             float width = handWidth.sqrMagnitude;
             maxArmWidth = Mathf.Max(width, maxArmWidth);
             float angle = Vector3.Angle(handWidth, transform.right);
-            Debug.Log("distance: " + width);
-            Debug.Log("maxArmWidth: " + maxArmWidth);
-            Debug.Log("volume: " + width / maxArmWidth);
-            //Debug.Log("angle: " + angle);
-            //Transform jointHandLeft = bodyObject.transform.FindChild(Kinect.JointType.HandLeft.ToString());
-            //Transform jointHandRight = bodyObject.transform.FindChild(Kinect.JointType.HandRight.ToString());
-            //LineRenderer doughLine = jointHandLeft.GetComponent<LineRenderer>();
-            //doughLine.SetPosition(0, jointHandLeft.localPosition);
-            //doughLine.SetPosition(1, GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]));
-            //doughLine.SetColors(GetColorForState(body.Joints[Kinect.JointType.HandLeft].TrackingState), GetColorForState(body.Joints[Kinect.JointType.HandRight].TrackingState));
+            //Debug.Log("distance: " + width);
+            //Debug.Log("maxArmWidth: " + maxArmWidth);
+            //Debug.Log("volume: " + width / maxArmWidth);
+            // compute log scale from linear scale
             // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
             
@@ -248,11 +242,10 @@ public class BodySourceView : MonoBehaviour
             //Debug.Log("distance: " + width);
             //Debug.Log("maxArmWidth: " + maxArmWidth);
             //Debug.Log("volume: " + width / maxArmWidth);
+            //Debug.Log("depth: " + depth / maxHandDepth);
 
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
             float depthLog = (Mathf.Log(depth)) / (Mathf.Log(maxHandDepth));
-
-            Debug.Log("OSC Paths" + _oscPaths.Count);
 
             oscControl.SendOSC(_oscPaths[0], widthLog);
             oscControl.SendOSC(_oscPaths[1], angle / 180f);
@@ -267,11 +260,8 @@ public class BodySourceView : MonoBehaviour
     /// <param name="oscPaths"></param>
     public void SetOSCPaths(List<string> oscPaths)
     {
-
-        Debug.Log("OSC Paths before:" + _oscPaths.Count);
         _oscPaths.Clear();
         _oscPaths = oscPaths;
-        Debug.Log("OSC Paths after:" + _oscPaths.Count);
     }
 
     /// <summary>
@@ -302,15 +292,15 @@ public class BodySourceView : MonoBehaviour
         Vector3 leftHandDepth = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineShoulder]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         Vector3 rightHandDepth = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineShoulder]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
 
-        float leftHandDepthMag = leftHandDepth.sqrMagnitude;
-        float rightHandDepthMag = rightHandDepth.sqrMagnitude;
+        float leftHandDepthMagZ = Mathf.Abs(leftHandDepth.z);
+        float rightHandDepthMagZ = Mathf.Abs(rightHandDepth.z);
 
-        if (leftHandDepthMag > rightHandDepthMag)
+        if (leftHandDepthMagZ > rightHandDepthMagZ)
         {
-            return leftHandDepthMag;
+            return leftHandDepthMagZ;
         } else
         {
-            return rightHandDepthMag;
+            return rightHandDepthMagZ;
         }
     }
 
