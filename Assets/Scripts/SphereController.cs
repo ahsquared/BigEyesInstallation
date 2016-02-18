@@ -12,13 +12,11 @@ public class SphereController : OSCBodyController
     // Use this for initialization
     void Start()
     {
-        controller = gameObject;
         controlType = "sphere";
         oscPaths.Add(widthControlPath);
         oscPaths.Add(rotationControlPath);
         oscPaths.Add(depthControlPath);
-        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
-        time = maxTime;
+        //gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
     }
 
 }

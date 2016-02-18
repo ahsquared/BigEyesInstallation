@@ -17,6 +17,8 @@ namespace BigEyes
         public string IPAddress;
         public int port;
 
+        public bool controllerActive = false;
+
 		void Start()
 		{
 			// Ensure that we have a OscOut component.

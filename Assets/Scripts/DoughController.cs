@@ -11,12 +11,10 @@ public class DoughController : OSCBodyController
     // Use this for initialization
     void Start()
     {
-        controller = gameObject;
         controlType = "dough";
         oscPaths.Add(widthControlPath);
         oscPaths.Add(rotationControlPath);
-        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
-        time = maxTime;
+        //gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
     }
 }
 

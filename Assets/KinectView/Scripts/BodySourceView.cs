@@ -260,8 +260,14 @@ public class BodySourceView : MonoBehaviour
     /// <param name="oscPaths"></param>
     public void SetOSCPaths(List<string> oscPaths)
     {
+
+        Debug.Log("OSC Paths before:" + _oscPaths.Count);
         _oscPaths.Clear();
-        _oscPaths = oscPaths;
+        foreach (string path in oscPaths)
+        {
+            _oscPaths.Add(path);
+        }
+        Debug.Log("OSC Paths after:" + _oscPaths.Count);
     }
 
     /// <summary>
