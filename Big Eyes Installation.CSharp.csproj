@@ -123,7 +123,10 @@
     <Compile Include="Assets\OSC simpl\OscIn.cs" />
     <Compile Include="Assets\OSC simpl\OscOut.cs" />
     <Compile Include="Assets\Scripts\ControlSelector.cs" />
+    <Compile Include="Assets\Scripts\DoughController.cs" />
     <Compile Include="Assets\Scripts\OSCController.cs" />
+    <Compile Include="Assets\Scripts\OSCPaths.cs" />
+    <Compile Include="Assets\Scripts\SphereController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GreenScreen\Materials\GreenScreenShader.shader" />

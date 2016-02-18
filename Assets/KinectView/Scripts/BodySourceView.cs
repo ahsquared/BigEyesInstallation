@@ -19,6 +19,9 @@ public class BodySourceView : MonoBehaviour
     private GameObject trail;
 
     private float maxArmWidth = 0f;
+    private float maxHandDepth = 0f;
+
+    private List<string> _oscPaths = new List<string>();
 
     /// <summary>
     /// The currently tracked body
@@ -214,11 +217,13 @@ public class BodySourceView : MonoBehaviour
         }
         if (controlType.ToLower() == "dough")
         {
-            Vector3 offset = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
-            float distance = offset.sqrMagnitude;
-            maxArmWidth = Mathf.Max(distance, maxArmWidth);
-            float angle = Vector3.Angle(offset, transform.right);
-            Debug.Log("distance: " + distance / 100f);
+            Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+            float width = handWidth.sqrMagnitude;
+            maxArmWidth = Mathf.Max(width, maxArmWidth);
+            float angle = Vector3.Angle(handWidth, transform.right);
+            Debug.Log("distance: " + width);
+            Debug.Log("maxArmWidth: " + maxArmWidth);
+            Debug.Log("volume: " + width / maxArmWidth);
             //Debug.Log("angle: " + angle);
             //Transform jointHandLeft = bodyObject.transform.FindChild(Kinect.JointType.HandLeft.ToString());
             //Transform jointHandRight = bodyObject.transform.FindChild(Kinect.JointType.HandRight.ToString());
@@ -226,9 +231,86 @@ public class BodySourceView : MonoBehaviour
             //doughLine.SetPosition(0, jointHandLeft.localPosition);
             //doughLine.SetPosition(1, GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]));
             //doughLine.SetColors(GetColorForState(body.Joints[Kinect.JointType.HandLeft].TrackingState), GetColorForState(body.Joints[Kinect.JointType.HandRight].TrackingState));
+            // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
+            float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
+            
+            oscControl.SendOSC(_oscPaths[0], widthLog);
+            oscControl.SendOSC(_oscPaths[1], angle / 180f);
+        }
+        if (controlType.ToLower() == "sphere")
+        {
+            float width = getHandWidth(body);
+            maxArmWidth = Mathf.Max(width, maxArmWidth);
+            float angle = getHandAngle(body);
+            float depth = getHandDepthFromBody(body);
+            maxHandDepth = Mathf.Max(depth, maxHandDepth);
 
-            oscControl.SendOSC("/clank/volume", distance / maxArmWidth);
-            oscControl.SendOSC("/clank/reverb", angle / 180f);
+            //Debug.Log("distance: " + width);
+            //Debug.Log("maxArmWidth: " + maxArmWidth);
+            //Debug.Log("volume: " + width / maxArmWidth);
+
+            float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
+            float depthLog = (Mathf.Log(depth)) / (Mathf.Log(maxHandDepth));
+
+            Debug.Log("OSC Paths" + _oscPaths.Count);
+
+            oscControl.SendOSC(_oscPaths[0], widthLog);
+            oscControl.SendOSC(_oscPaths[1], angle / 180f);
+            oscControl.SendOSC(_oscPaths[2], depthLog);
+        }
+    }
+
+    /// <summary>
+    /// Set OSC Paths used by controllers
+    ///
+    /// </summary>
+    /// <param name="oscPaths"></param>
+    public void SetOSCPaths(List<string> oscPaths)
+    {
+
+        Debug.Log("OSC Paths before:" + _oscPaths.Count);
+        _oscPaths.Clear();
+        _oscPaths = oscPaths;
+        Debug.Log("OSC Paths after:" + _oscPaths.Count);
+    }
+
+    /// <summary>
+    /// get the distance between the left and right hand
+    /// </summary>
+    /// <param name="body"></param>
+    /// <returns>float between left and right hand</returns>
+    float getHandWidth(Kinect.Body body)
+    {
+        Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        return handWidth.sqrMagnitude;
+    }
+    
+    /// <summary>
+    /// get the angle of the line between left and right hands relative to floor
+    /// </summary>
+    /// <param name="handWidth"></param>
+    /// <returns>float</returns>
+    float getHandAngle(Kinect.Body body)
+    {
+        Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        float angle = Vector3.Angle(handWidth, transform.right);
+        return angle;
+    }
+
+    float getHandDepthFromBody(Kinect.Body body)
+    {
+        Vector3 leftHandDepth = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineShoulder]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        Vector3 rightHandDepth = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineShoulder]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
+
+        float leftHandDepthMag = leftHandDepth.sqrMagnitude;
+        float rightHandDepthMag = rightHandDepth.sqrMagnitude;
+
+        if (leftHandDepthMag > rightHandDepthMag)
+        {
+            return leftHandDepthMag;
+        } else
+        {
+            return rightHandDepthMag;
         }
     }
 

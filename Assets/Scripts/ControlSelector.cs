@@ -8,11 +8,22 @@ public class ControlSelector : MonoBehaviour
     public string controlType = "";
     public string[] oscPaths;
 
+    void Awake ()
+    {
+        if (controlType == "dough")
+        {
+            oscPaths = new string[2];
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
         gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
         //if (controlType == "dough")
+        //{
+        //    oscPaths = new string[2];
+        //}
     }
 
     // Update is called once per frame
