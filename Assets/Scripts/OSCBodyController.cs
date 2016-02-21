@@ -10,6 +10,8 @@ public class OSCBodyController : MonoBehaviour {
     public string controlType;
     public List<string> oscPaths = new List<string>();
 
+    public GameObject visualizer;
+
     public int maxTime = 100;
     public int time;
 
@@ -51,6 +53,8 @@ public class OSCBodyController : MonoBehaviour {
             oscController.controllerActive = true;
             gameObject.GetComponent<Renderer>().material.color = new Color(1f, 0, 0, 0.5f);
             gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, 0));
+            _bodySourceView.bodyController = gameObject.GetComponent<OSCBodyController>();
+            _bodySourceView.bodyControllerViz = visualizer;
             _bodySourceView.SetOSCPaths(oscPaths);
             _bodySourceView.SetControlType(controlType);
             StartCoroutine("handleTimerEvent", time);

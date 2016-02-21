@@ -12,6 +12,9 @@ public class BodySourceView : MonoBehaviour
     public BigEyes.OSCController oscController;
     private BigEyes.OSCController oscControl;
 
+    public OSCBodyController bodyController;
+    public GameObject bodyControllerViz;
+
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
 
@@ -247,6 +250,10 @@ public class BodySourceView : MonoBehaviour
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
             float depthLog = (Mathf.Log(depth)) / (Mathf.Log(maxHandDepth));
 
+            bodyControllerViz.transform.position = getCenterPosition(body);
+            bodyControllerViz.transform.localScale = new Vector3(width / 3, width / 3, depth  / 3);
+            bodyControllerViz.transform.localEulerAngles = new Vector3(0f, 0f, angle); 
+
             oscControl.SendOSC(_oscPaths[0], widthLog);
             oscControl.SendOSC(_oscPaths[1], angle / 180f);
             oscControl.SendOSC(_oscPaths[2], depthLog);
@@ -270,6 +277,12 @@ public class BodySourceView : MonoBehaviour
         Debug.Log("OSC Paths after:" + _oscPaths.Count);
     }
 
+    Vector3 getCenterPosition(Kinect.Body body)
+    {
+        Vector3 midPoint = ((GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft])) * 0.5f) + GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+        return midPoint;
+    }
+
     /// <summary>
     /// get the distance between the left and right hand
     /// </summary>
@@ -278,7 +291,7 @@ public class BodySourceView : MonoBehaviour
     float getHandWidth(Kinect.Body body)
     {
         Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
-        return handWidth.sqrMagnitude;
+        return handWidth.magnitude;
     }
     
     /// <summary>
