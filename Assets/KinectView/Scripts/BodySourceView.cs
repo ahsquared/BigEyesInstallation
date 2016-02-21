@@ -231,9 +231,9 @@ public class BodySourceView : MonoBehaviour
             // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
 
+            bodyControllerViz.transform.localScale = new Vector3(1f, handWidth.magnitude / 6, 1f);
             bodyControllerViz.transform.rotation = Quaternion.LookRotation(handWidth) * Quaternion.Euler(90, 0, 0);
             bodyControllerViz.transform.position = getCenterPosition(body);
-            bodyControllerViz.transform.localScale = new Vector3(1f, Math.Abs(handWidth.x) / 6, 1f);
 
             oscControl.SendOSC(_oscPaths[0], widthLog);
             oscControl.SendOSC(_oscPaths[1], angle / 180f);
@@ -254,9 +254,9 @@ public class BodySourceView : MonoBehaviour
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
             float depthLog = (Mathf.Log(depth)) / (Mathf.Log(maxHandDepth));
 
+            bodyControllerViz.transform.localScale = new Vector3(width / 3, width / 3, width / 3);
             bodyControllerViz.transform.rotation = Quaternion.LookRotation(GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]));
             bodyControllerViz.transform.position = getCenterPosition(body);
-            bodyControllerViz.transform.localScale = new Vector3(width / 3, width / 3, width / 3);
 
             oscControl.SendOSC(_oscPaths[0], widthLog);
             oscControl.SendOSC(_oscPaths[1], angle / 180f);
