@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Timers;
 
-public class DoughController : OSCBodyController
+public class CylinderController : OSCBodyController
 {
 
     public string widthControlPath = "/clank/volume";
@@ -11,7 +11,7 @@ public class DoughController : OSCBodyController
     // Use this for initialization
     void Start()
     {
-        controlType = "dough";
+        controlType = "cylinder";
         oscPaths.Add(widthControlPath);
         oscPaths.Add(rotationControlPath);
         //gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
