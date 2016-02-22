@@ -23,6 +23,9 @@ public class BodySourceView : MonoBehaviour
 
     private float maxArmWidth = 0f;
     private float maxHandDepth = 0f;
+    private float groundPositionY = 0f;
+
+    public GameObject ground;
 
     private List<string> _oscPaths = new List<string>();
 
@@ -170,14 +173,12 @@ public class BodySourceView : MonoBehaviour
             jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
             jointObj.name = jt.ToString();
             jointObj.transform.parent = body.transform;
-            //if (jt == Kinect.JointType.HandLeft)
-            //{
-            //    jointObj.GetComponent<Collider>().isTrigger = true;
-            //    LineRenderer doughLine = jointObj.AddComponent<LineRenderer>();
-            //    doughLine.SetVertexCount(2);
-            //    doughLine.material = BoneMaterial;
-            //    doughLine.SetWidth(0.05f, .05f);
-            //}
+
+            if (jt == Kinect.JointType.Head)
+            {
+                jointObj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            }
+            
         }
         trail = GameObject.Find("Trail");
         trail.GetComponent<TrailRenderer>().enabled = false;
@@ -196,6 +197,21 @@ public class BodySourceView : MonoBehaviour
                 targetJoint = body.Joints[_BoneMap[jt]];
             }
 
+            if (jt == Kinect.JointType.FootLeft)
+            {
+                groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft]).y);
+            }
+            if (jt == Kinect.JointType.FootRight)
+            {
+                groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
+            }
+            Debug.Log("groundPositionY: " + groundPositionY);
+
+            if (ground)
+            {
+                ground.transform.position = new Vector3(0f, groundPositionY, 0f);
+            }
+
             Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
 
@@ -210,6 +226,7 @@ public class BodySourceView : MonoBehaviour
             {
                 lr.enabled = false;
             }
+            
         }
 
         if (controlType == "trail")
@@ -231,7 +248,7 @@ public class BodySourceView : MonoBehaviour
             // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
 
-            bodyControllerViz.transform.localScale = new Vector3(1f, handWidth.magnitude / 6, 1f);
+            bodyControllerViz.transform.localScale = new Vector3(0.2f, handWidth.magnitude / 6, 0.2f);
             bodyControllerViz.transform.rotation = Quaternion.LookRotation(handWidth) * Quaternion.Euler(90, 0, 0);
             bodyControllerViz.transform.position = getCenterPosition(body);
 

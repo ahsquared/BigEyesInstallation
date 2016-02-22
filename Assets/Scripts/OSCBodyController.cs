@@ -73,7 +73,7 @@ public class OSCBodyController : MonoBehaviour {
         gameObject.GetComponent<Renderer>().material.color = new Color(1f, 1f, 1f);
         time = maxTime;
         timerText.text = "";
-        visualizer.transform.localScale = new Vector3(1f, 1f, 1f);
+        visualizer.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         visualizer.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
         visualizer.transform.localPosition = new Vector3(0f, 0f, 0f);
         oscController.controllerActive = false;
