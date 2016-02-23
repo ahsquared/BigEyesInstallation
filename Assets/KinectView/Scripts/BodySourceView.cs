@@ -205,7 +205,6 @@ public class BodySourceView : MonoBehaviour
             {
                 groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
             }
-            Debug.Log("groundPositionY: " + groundPositionY);
 
             if (ground)
             {
@@ -226,9 +225,8 @@ public class BodySourceView : MonoBehaviour
             {
                 lr.enabled = false;
             }
-            
-        }
 
+        }
         if (controlType == "trail")
         {
             var pos = GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
