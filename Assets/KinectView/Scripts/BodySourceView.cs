@@ -23,8 +23,11 @@ public class BodySourceView : MonoBehaviour
 
     private float maxArmWidth = 0f;
     private float maxHandDepth = 0f;
-    private float groundPositionY = 0f;
 
+    public bool addLines = false;
+
+    public bool addRigidBody = false;
+    private float groundPositionY = 0f;
     public GameObject ground;
 
     private List<string> _oscPaths = new List<string>();
@@ -160,25 +163,33 @@ public class BodySourceView : MonoBehaviour
     private GameObject CreateBodyObject(ulong id)
     {
         GameObject body = new GameObject("Body:" + id);
+        if (addRigidBody)
+        {
+            body.AddComponent<Rigidbody>();
+            body.transform.position = new Vector3(0, 5, 0);
+            body.GetComponent<Rigidbody>().freezeRotation = true;
+        }
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-            LineRenderer lr = jointObj.AddComponent<LineRenderer>();
-            lr.SetVertexCount(2);
-            lr.material = BoneMaterial;
-            lr.SetWidth(0.05f, .05f);
-
             jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
             jointObj.name = jt.ToString();
             jointObj.transform.parent = body.transform;
+
+            if (addLines)
+            {
+                LineRenderer lr = jointObj.AddComponent<LineRenderer>();
+                lr.SetVertexCount(2);
+                lr.material = BoneMaterial;
+                lr.SetWidth(1f, 1f);
+            }
 
             if (jt == Kinect.JointType.Head)
             {
                 jointObj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             }
-            
+
         }
         trail = GameObject.Find("Trail");
         trail.GetComponent<TrailRenderer>().enabled = false;
@@ -187,6 +198,10 @@ public class BodySourceView : MonoBehaviour
 
     private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
+        float groundOffset;
+        Vector3 targetPosition;
+        Vector3 offsetTargetPosition;
+
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             Kinect.Joint sourceJoint = body.Joints[jt];
@@ -205,25 +220,27 @@ public class BodySourceView : MonoBehaviour
             {
                 groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
             }
-
-            if (ground)
-            {
-                ground.transform.position = new Vector3(0f, groundPositionY, 0f);
-            }
+            
+            groundOffset = -(groundPositionY - ground.transform.position.y);
 
             Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
-
-            LineRenderer lr = jointObj.GetComponent<LineRenderer>();
-            if (targetJoint.HasValue)
+            Vector3 offsetJointPosition = new Vector3(jointObj.localPosition.x, jointObj.localPosition.y + groundOffset, jointObj.localPosition.z);
+            if (addLines)
             {
-                lr.SetPosition(0, jointObj.localPosition);
-                lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
-                lr.SetColors(GetColorForState(sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
-            }
-            else
-            {
-                lr.enabled = false;
+                LineRenderer lr = jointObj.GetComponent<LineRenderer>();
+                if (targetJoint.HasValue)
+                {
+                    targetPosition = GetVector3FromJoint(targetJoint.Value);
+                    offsetTargetPosition = new Vector3(targetPosition.x, targetPosition.y + groundOffset, targetPosition.z);
+                    lr.SetPosition(0, offsetJointPosition);
+                    lr.SetPosition(1, offsetTargetPosition);
+                    lr.SetColors(GetColorForState(sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
+                }
+                else
+                {
+                    lr.enabled = false;
+                }
             }
 
         }
@@ -312,7 +329,7 @@ public class BodySourceView : MonoBehaviour
         Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         return handWidth.magnitude;
     }
-    
+
     /// <summary>
     /// get the angle of the line between left and right hands relative to floor
     /// </summary>
@@ -336,7 +353,8 @@ public class BodySourceView : MonoBehaviour
         if (leftHandDepthMagZ > rightHandDepthMagZ)
         {
             return leftHandDepthMagZ;
-        } else
+        }
+        else
         {
             return rightHandDepthMagZ;
         }
@@ -388,7 +406,7 @@ public class BodySourceView : MonoBehaviour
     public void SetControlType(string ct)
     {
         controlType = ct;
-       
+
     }
 
     private static Color GetColorForState(Kinect.TrackingState state)
