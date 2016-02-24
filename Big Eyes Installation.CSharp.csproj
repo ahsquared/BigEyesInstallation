@@ -74,6 +74,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ControllerTrigger.cs" />
     <Compile Include="Assets\GreenScreen\Scripts\CoordinateMapperManager.cs" />
     <Compile Include="Assets\GreenScreen\Scripts\CoordinateMapperView.cs" />
     <Compile Include="Assets\KinectView\Scripts\BodySourceManager.cs" />

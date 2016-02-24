@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
@@ -6,6 +7,8 @@ using Math = System.Math;
 
 public class BodySourceView : MonoBehaviour
 {
+    public GameObject mainCamera;
+
     public Material BoneMaterial;
     public GameObject BodySourceManager;
 
@@ -163,6 +166,7 @@ public class BodySourceView : MonoBehaviour
     private GameObject CreateBodyObject(ulong id)
     {
         GameObject body = new GameObject("Body:" + id);
+
         if (addRigidBody)
         {
             body.AddComponent<Rigidbody>();
@@ -191,6 +195,9 @@ public class BodySourceView : MonoBehaviour
             }
 
         }
+
+        mainCamera.GetComponent<DepthOfField>().focalTransform = GameObject.Find("SpineBase").transform;
+
         trail = GameObject.Find("Trail");
         trail.GetComponent<TrailRenderer>().enabled = false;
         return body;
@@ -198,9 +205,6 @@ public class BodySourceView : MonoBehaviour
 
     private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
-        float groundOffset;
-        Vector3 targetPosition;
-        Vector3 offsetTargetPosition;
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
@@ -221,20 +225,16 @@ public class BodySourceView : MonoBehaviour
                 groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
             }
             
-            groundOffset = -(groundPositionY - ground.transform.position.y);
-
             Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
-            Vector3 offsetJointPosition = new Vector3(jointObj.localPosition.x, jointObj.localPosition.y + groundOffset, jointObj.localPosition.z);
+
             if (addLines)
             {
                 LineRenderer lr = jointObj.GetComponent<LineRenderer>();
                 if (targetJoint.HasValue)
-                {
-                    targetPosition = GetVector3FromJoint(targetJoint.Value);
-                    offsetTargetPosition = new Vector3(targetPosition.x, targetPosition.y + groundOffset, targetPosition.z);
-                    lr.SetPosition(0, offsetJointPosition);
-                    lr.SetPosition(1, offsetTargetPosition);
+                {                   
+                    lr.SetPosition(0, jointObj.localPosition);
+                    lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
                     lr.SetColors(GetColorForState(sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
                 }
                 else
@@ -263,7 +263,7 @@ public class BodySourceView : MonoBehaviour
             // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
 
-            bodyControllerViz.transform.localScale = new Vector3(0.2f, handWidth.magnitude / 6, 0.2f);
+            bodyControllerViz.transform.localScale = new Vector3(0.2f, handWidth.magnitude / 4, 0.2f);
             bodyControllerViz.transform.rotation = Quaternion.LookRotation(handWidth) * Quaternion.Euler(90, 0, 0);
             bodyControllerViz.transform.position = getCenterPosition(body);
 
@@ -286,7 +286,7 @@ public class BodySourceView : MonoBehaviour
             float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
             float depthLog = (Mathf.Log(depth)) / (Mathf.Log(maxHandDepth));
 
-            bodyControllerViz.transform.localScale = new Vector3(width / 3, width / 3, width / 3);
+            bodyControllerViz.transform.localScale = new Vector3(width / 2, width / 2, width / 2);
             bodyControllerViz.transform.rotation = Quaternion.LookRotation(GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]));
             bodyControllerViz.transform.position = getCenterPosition(body);
 

@@ -14,7 +14,7 @@ public class CylinderController : OSCBodyController
         controlType = "cylinder";
         oscPaths.Add(widthControlPath);
         oscPaths.Add(rotationControlPath);
-        //gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -1));
+        //gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -2));
     }
 }
 
