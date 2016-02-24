@@ -23,8 +23,8 @@ public class OSCBodyController : MonoBehaviour {
         oscController = GameObject.Find("OSC").GetComponent<BigEyes.OSCController>();
         time = maxTime;
         
-    }
-
+    } 
+    
 
     // Update is called once per frame
     //void Update()

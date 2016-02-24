@@ -7,6 +7,7 @@ public class CylinderController : OSCBodyController
 
     public string widthControlPath = "/clank/volume";
     public string rotationControlPath = "/clank/reverb";
+    public float velocity = -10f;
 
     // Use this for initialization
     void Start()
@@ -14,7 +15,8 @@ public class CylinderController : OSCBodyController
         controlType = "cylinder";
         oscPaths.Add(widthControlPath);
         oscPaths.Add(rotationControlPath);
-        //gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, -2));
+
+        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, (Random.value * velocity) + velocity));
     }
 }
 
