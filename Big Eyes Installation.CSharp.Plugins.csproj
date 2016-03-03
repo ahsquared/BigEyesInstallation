@@ -471,6 +471,12 @@
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_UnityStandardCore.cginc" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_UnityStandardInput.cginc" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_Unlit.cginc" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAdditive.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAdditiveFast.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlended.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlendedFast.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineStripShaderAdditive.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineStripShaderAlphaBlended.shader" />
     <None Include="Assets\iTweenEditor\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
