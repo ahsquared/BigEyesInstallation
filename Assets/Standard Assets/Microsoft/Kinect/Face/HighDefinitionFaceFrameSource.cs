@@ -28,7 +28,7 @@ namespace Microsoft.Kinect.Face
         private static extern void Microsoft_Kinect_Face_HighDefinitionFaceFrameSource_ReleaseObject(ref RootSystem.IntPtr pNative);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_HighDefinitionFaceFrameSource_AddRefObject(ref RootSystem.IntPtr pNative);
-        private void Dispose(bool disposing)
+        public void Dispose(bool disposing)
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {

@@ -105,6 +105,24 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
+    <Reference Include="OpenCvSharp">
+      <HintPath>Assets\KinectScripts\OpenCV\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>Assets\KinectScripts\SharpZipLib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="VacuumShaders">
+      <HintPath>Assets\VacuumShaders\Editor\VacuumShaders.dll</HintPath>
+    </Reference>
+    <Reference Include="VacuumShaders.MeshMaterializerVC">
+      <HintPath>Assets\VacuumShaders\Mesh Materializer\Editor\VacuumShaders.MeshMaterializerVC.dll</HintPath>
+    </Reference>
+    <Reference Include="VacuumShaders.MeshMaterializer_Editor">
+      <HintPath>Assets\VacuumShaders\Mesh Materializer\Editor\VacuumShaders.MeshMaterializer_Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="VacuumShaders.MeshMaterializer">
+      <HintPath>Assets\VacuumShaders\Mesh Materializer\Scripts\VacuumShaders.MeshMaterializer.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Big Eyes Installation.CSharp.Plugins.csproj">
@@ -139,9 +157,13 @@
     <Compile Include="Assets\OSC simpl\Base\Internal\Editor\OscInInspector.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Editor\OscMappingDrawer.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Editor\OscOutInspector.cs" />
+    <Compile Include="Assets\VacuumShaders\Vertex Color\Editor\VertexColor_MaterialEditor.cs" />
+    <Compile Include="Assets\iTweenEditor\Editor\iTweenEventDataEditor.cs" />
+    <Compile Include="Assets\iTweenEditor\Editor\iTweenPathEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GreenScreen\Materials\GreenScreenShader.shader" />
+    <None Include="Assets\KinectDemos\RecorderDemo\Resources\PlayerGrammar.grxml.txt" />
     <None Include="Assets\OSC simpl\Documents\Versions.txt" />
     <None Include="Assets\Plugins\x86\NuiDatabase\Expression\NuiExpressionModelManifest.txt" />
     <None Include="Assets\Plugins\x86\NuiDatabase\HDFaceTracker\AAMModel\Map2D3D_F.txt" />
@@ -175,6 +197,16 @@
     <None Include="Assets\Plugins\x86_64\NuiDatabase\HDFaceTracker\ViewModel\left.p.txt" />
     <None Include="Assets\Plugins\x86_64\NuiDatabase\HDFaceTracker\ViewModel\right.p.txt" />
     <None Include="Assets\Plugins\x86_64\NuiDatabase\HDFaceTracker\WholeHeadModel\FullHeadMaskVertexCorrespondence.txt" />
+    <None Include="Assets\Resources\BlurShader.shader" />
+    <None Include="Assets\Resources\BlurShader2.shader" />
+    <None Include="Assets\Resources\BlurShader3.shader" />
+    <None Include="Assets\Resources\BodyShader.shader" />
+    <None Include="Assets\Resources\Color2DepthShader.shader" />
+    <None Include="Assets\Resources\Depth2ColorShader.shader" />
+    <None Include="Assets\Resources\DepthShader.shader" />
+    <None Include="Assets\Resources\Dilate.shader" />
+    <None Include="Assets\Resources\Erode.shader" />
+    <None Include="Assets\Resources\SpeechGrammar.grxml.txt" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
@@ -252,6 +284,110 @@
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Other\Materials\Unlit_Shadows.shader" />
+    <None Include="Assets\VacuumShaders\Mesh Materializer\Scripts\ReadMe.txt" />
+    <None Include="Assets\VacuumShaders\Mesh Materializer\Shaders\Blur.shader" />
+    <None Include="Assets\VacuumShaders\Mesh Materializer\Shaders\Dummy.shader" />
+    <None Include="Assets\VacuumShaders\Mesh Materializer\Shaders\Per-Vertex Ambient Occlusion.shader" />
+    <None Include="Assets\VacuumShaders\Mesh Materializer\Shaders\UV.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Basemap\Basemap.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Packages\ReadMe.txt" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\BumpedSpecular_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\BumpedSpecular_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\BumpedSpecular_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Bumped_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Bumped_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Bumped_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_5.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_6.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_7.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_8.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Bumped_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Bumped_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Bumped_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_5.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_6.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_7.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_8.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Bumped_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Bumped_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Bumped_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_5.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_6.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_7.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_8.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_5.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_6.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_7.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_8.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_Deferred.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_ODL.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_Unlit.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_Variables.cginc" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Packages\ReadMe.txt" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha-Diffuse.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha-Parallax.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha-ParallaxSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha2-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha2-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha2-Diffuse.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha2-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha2-Parallax.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Alpha2-ParallaxSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\AlphaTest-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\AlphaTest-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\AlphaTest-Diffuse.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\AlphaTest-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Illumin-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Illumin-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Illumin-Diffuse.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Illumin-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Illumin-Parallax.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Illumin-ParallaxSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-Diffuse.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-DiffuseDecal.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-DiffuseDetail.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-Parallax.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Normal-ParallaxSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Reflect-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Reflect-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Reflect-Diffuse.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Reflect-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Reflect-Parallax.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Legacy Shaders\Reflect-ParallaxSpec.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Cutout.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Opaque.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Transparent.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Transparent_2Pass.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Standard\Standard.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Standard\StandardSpecular.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Cutout.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Opaque.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Transparent.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Transparent_2Pass.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_ODL.cginc" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_UnityStandardCore.cginc" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_UnityStandardInput.cginc" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_Unlit.cginc" />
+    <None Include="Assets\iTweenEditor\README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
