@@ -50,15 +50,15 @@ public class CreateSinShapedLineStrip : MonoBehaviour
 
     void Update()
     {
-        for (int i = 0; i < m_numVertices; ++i)
-        {
+        //for (int i = 0; i < m_numVertices; ++i)
+        //{
             
-            float x = Mathf.Lerp(m_start, m_end, (float)i / (float)(m_numVertices - 1));
-            float y = Mathf.Sin(x + Time.time * freq);
-            lineVertices[i] = gameObject.transform.TransformPoint(new Vector3(x, y, 0f));
-        }
+        //    float x = Mathf.Lerp(m_start, m_end, (float)i / (float)(m_numVertices - 1));
+        //    float y = Mathf.Sin(x + Time.time * freq);
+        //    lineVertices[i] = gameObject.transform.TransformPoint(new Vector3(x, y, 0f));
+        //}
 
-        volLineStrip.UpdateLineVertices(lineVertices);
+        //volLineStrip.UpdateLineVertices(lineVertices);
 
     }
 	void OnDrawGizmos()

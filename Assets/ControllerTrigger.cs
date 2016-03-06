@@ -12,11 +12,16 @@ public class ControllerTrigger : MonoBehaviour {
         controllerObj = gameObject.transform.parent.gameObject.GetComponent<OSCBodyController>();
         
     }
+
     void OnTriggerEnter(Collider other)
     {
-        if ((other.name == "HandLeft" || other.name == "HandRight") && !controllerObj.oscController.controllerActive)
+        if ((other.name == "HandLeft" || other.name == "HandRight" ||
+            other.name == "WristLeft" || other.name == "WristRight" ||
+            other.name == "ThumbLeft" || other.name == "ThumbRight" ||
+            other.name == "HandTipLeft" || other.name == "HandTipRight") && !controllerObj.oscController.controllerActive)
         {
             Debug.Log("hit hand");
+            Debug.Log(controllerObj);
             if (controllerObj.timerText == null)
             {
                 controllerObj.timerText = controllerObj.GetComponentInChildren<Text>();
@@ -30,6 +35,7 @@ public class ControllerTrigger : MonoBehaviour {
             controllerObj._bodySourceView.bodyControllerViz = controllerObj.visualizer;
             controllerObj._bodySourceView.SetOSCPaths(controllerObj.oscPaths);
             controllerObj._bodySourceView.SetControlType(controllerObj.controlType);
+            controllerObj.GetComponent<Rigidbody>().isKinematic = true;
             StartCoroutine("handleTimerEvent", controllerObj.time);
         }
     }
@@ -50,6 +56,6 @@ public class ControllerTrigger : MonoBehaviour {
         controllerObj.visualizer.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
         controllerObj.visualizer.transform.localPosition = new Vector3(0f, 0f, 0f);
         controllerObj.oscController.controllerActive = false;
-
+        Destroy(controllerObj);
     }
 }

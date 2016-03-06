@@ -83,6 +83,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ControllerSpawner.cs" />
     <Compile Include="Assets\ControllerTrigger.cs" />
     <Compile Include="Assets\GreenScreen\Scripts\CoordinateMapperManager.cs" />
     <Compile Include="Assets\GreenScreen\Scripts\CoordinateMapperView.cs" />
@@ -162,6 +163,7 @@
     <Compile Include="Assets\KinectView\Scripts\InfraredSourceManager.cs" />
     <Compile Include="Assets\KinectView\Scripts\InfraredSourceView.cs" />
     <Compile Include="Assets\KinectView\Scripts\MultiSourceManager.cs" />
+    <Compile Include="Assets\LookAtCamera.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Events\OscBlobEvent.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Events\OscBoolEvent.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Events\OscCharEvent.cs" />

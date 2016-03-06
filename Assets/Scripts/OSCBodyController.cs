@@ -21,10 +21,18 @@ public class OSCBodyController : MonoBehaviour {
     void Awake()
     {
         oscController = GameObject.Find("OSC").GetComponent<BigEyes.OSCController>();
+        _bodySourceView = GameObject.Find("Body View").GetComponent<BodySourceView>();
         time = maxTime;
         
     } 
     
+    void Start()
+    {
+        if (_bodySourceView == null)
+        {
+            _bodySourceView = GameObject.Find("Body View").GetComponent<BodySourceView>();
+        }
+    }
 
     // Update is called once per frame
     //void Update()

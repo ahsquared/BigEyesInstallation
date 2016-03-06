@@ -116,7 +116,14 @@ public class BodySourceView : MonoBehaviour
             }
         }
 
-        List<ulong> knownIds = new List<ulong>(_Bodies.Keys);
+        List<ulong> knownIds = new List<ulong>(_Bodies.Keys);      
+
+        Kinect.Body closestBody = FindClosestBody(data);
+
+        if (closestBody == null)
+        {
+            return;
+        }
 
         // First delete untracked bodies
         foreach (ulong trackingId in knownIds)
@@ -126,13 +133,12 @@ public class BodySourceView : MonoBehaviour
                 Destroy(_Bodies[trackingId]);
                 _Bodies.Remove(trackingId);
             }
-        }
-
-        Kinect.Body closestBody = FindClosestBody(data);
-
-        if (closestBody == null)
-        {
-            return;
+            // delete bodies that aren't the closest
+            if (trackingId != closestBody.TrackingId)
+            {
+                Destroy(GameObject.Find("Body:" + trackingId));
+                _Bodies.Remove(trackingId);
+            }
         }
 
         if (closestBody.IsTracked)
@@ -144,6 +150,7 @@ public class BodySourceView : MonoBehaviour
 
             RefreshBodyObject(closestBody, _Bodies[closestBody.TrackingId]);
         }
+        
         //foreach (var body in data)
         //{
         //    if (body == null)
@@ -250,7 +257,7 @@ public class BodySourceView : MonoBehaviour
             trail.transform.position = pos;
 
         }
-        if (controlType.ToLower() == "cylinder")
+        if (controlType.ToLower() == "cylinder" && bodyControllerViz != null)
         {
             Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
             float width = handWidth.sqrMagnitude;
@@ -270,7 +277,7 @@ public class BodySourceView : MonoBehaviour
             oscControl.SendOSC(_oscPaths[0], widthLog);
             oscControl.SendOSC(_oscPaths[1], angle / 180f);
         }
-        if (controlType.ToLower() == "sphere")
+        if (controlType.ToLower() == "sphere" && bodyControllerViz != null)
         {
             float width = getHandWidth(body);
             maxArmWidth = Mathf.Max(width, maxArmWidth);
