@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Kinect Test.unity
+- path: Assets/Big Eyes Scenes/Big Eyes - 20160306.unity
   isLoaded: 1
   isActive: 1

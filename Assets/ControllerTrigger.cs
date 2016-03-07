@@ -29,6 +29,7 @@ public class ControllerTrigger : MonoBehaviour {
             }
 
             controllerObj.oscController.controllerActive = true;
+            controllerObj._bodySourceView.bodySide = (other.name == "HandLeft" || other.name == "WristLeft" || other.name == "ThumbLeft" || other.name == "HandTipLeft") ? "left" : "right";
             controllerObj.GetComponent<Renderer>().material.color = new Color(1f, 0, 0, 0.5f);
             controllerObj.GetComponent<Rigidbody>().velocity = controllerObj.transform.TransformDirection(new Vector3(0, 0, 0));
             controllerObj._bodySourceView.bodyController = controllerObj.GetComponent<OSCBodyController>();

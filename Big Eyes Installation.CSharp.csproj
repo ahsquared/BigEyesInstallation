@@ -206,6 +206,7 @@
     <Compile Include="Assets\Scripts\OSCController.cs" />
     <Compile Include="Assets\Scripts\OSCPaths.cs" />
     <Compile Include="Assets\Scripts\SphereController.cs" />
+    <Compile Include="Assets\Scripts\StickController.cs" />
     <Compile Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Scripts\Runtime.cs" />
     <Compile Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Scripts\Runtime_FacetedTerrain.cs" />
     <Compile Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Scripts\Runtime_MeshCombine.cs" />

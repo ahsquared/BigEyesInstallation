@@ -61,5 +61,10 @@ namespace BigEyes
             oscOut.Send(oscPath, value);
 
         }
-	}
+        public void SendOSC(string oscPath, float value, float value2)
+        {
+            oscOut.Send(oscPath, value, value2);
+
+        }
+    }
 }

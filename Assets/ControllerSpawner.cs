@@ -56,7 +56,7 @@ public class ControllerSpawner : MonoBehaviour
         StartCoroutine("handleTimerEvent", time);
 
         Vector3 initPos = new Vector3(Random.Range(-10f, 10f), 10f, 70f);
-        int controllerIndex = Random.Range(0, controllers.Length);
+        int controllerIndex = 2;// Random.Range(0, controllers.Length);
         _currentController = (GameObject)Instantiate(controllers[controllerIndex], initPos, Quaternion.identity);
         counter++;
         _currentController.name = _currentController.name + "-" + counter.ToString();
