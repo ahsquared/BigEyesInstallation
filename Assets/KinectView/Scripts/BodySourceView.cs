@@ -4,55 +4,58 @@ using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
 using Math = System.Math;
+using BigEyes;
 
 public class BodySourceView : MonoBehaviour
 {
-    public GameObject mainCamera;
+    public GameObject MainCamera;
 
-    public Material BoneMaterial;
+    public Material HandMaterial;
+    public GameObject ParticleSystem;
     public GameObject BodySourceManager;
 
-    public BigEyes.OSCController oscController;
-    private BigEyes.OSCController oscControl;
+    private OSCController _oscControl;
 
-    public OSCBodyController bodyController;
-    public GameObject bodyControllerViz;
+    public OSCBodyController BodyController;
+    public GameObject BodyControllerViz;
 
-    public string bodySide = "left";
-    private Kinect.HandState handState = Kinect.HandState.Unknown;
-    private bool handHasOpened = true;
-    public bool useHandState = false;
-    public int clapWidth = 10;
+    public string BodySide = "left";
+    private Kinect.HandState _handState = Kinect.HandState.Unknown;
+    private bool _handHasOpened = true;
+    public bool UseHandState = false;
+    public int ClapWidth = 10;
 
-    private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
-    private BodySourceManager _BodyManager;
+    public bool Mirrored = false;
+    public float ZOffset = 35f;
 
-    private string controlType = "none";
-    private GameObject trail;
+    private Dictionary<ulong, GameObject> _bodies = new Dictionary<ulong, GameObject>();
+    private BodySourceManager _bodyManager;
 
-    private float maxArmWidth = 0f;
-    private float maxHandDepth = 0f;
-    private float maxHeight = 0f;
+    private string _controlType = "none";
 
-    public bool addLines = false;
+    private float _maxArmWidth = 0f;
+    private float _maxHandDepth = 0f;
+    private float _maxHeight = 0f;
 
-    public bool addRigidBody = false;
-    private float groundPositionY = 0f;
-    public GameObject ground;
+    public bool AddLines = false;
+
+    public bool AddRigidBody = false;
+    private float _groundPositionY = 0f;
+    public GameObject Ground;
 
     private List<string> _oscPaths = new List<string>();
 
     /// <summary>
     /// The currently tracked body
     /// </summary>
-    private Kinect.Body currentTrackedBody = null;
+    private Kinect.Body _currentTrackedBody = null;
 
     /// <summary>
     /// The currently tracked body
     /// </summary>
-    private ulong currentTrackingId = 0;
+    private ulong _currentTrackingId = 0;
 
-    private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
+    private Dictionary<Kinect.JointType, Kinect.JointType> _boneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
         { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
         { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
@@ -85,9 +88,11 @@ public class BodySourceView : MonoBehaviour
 
     };
 
+   
+
     void Start()
     {
-        oscControl = oscController.GetComponent<BigEyes.OSCController>();
+       if (!_oscControl) _oscControl = GameObject.Find("OSC").GetComponent<OSCController>();
     }
 
     void Update()
@@ -97,13 +102,13 @@ public class BodySourceView : MonoBehaviour
             return;
         }
 
-        _BodyManager = BodySourceManager.GetComponent<BodySourceManager>();
-        if (_BodyManager == null)
+        _bodyManager = BodySourceManager.GetComponent<BodySourceManager>();
+        if (_bodyManager == null)
         {
             return;
         }
 
-        Kinect.Body[] data = _BodyManager.GetData();
+        Kinect.Body[] data = _bodyManager.GetData();
         if (data == null)
         {
             return;
@@ -123,7 +128,7 @@ public class BodySourceView : MonoBehaviour
             }
         }
 
-        List<ulong> knownIds = new List<ulong>(_Bodies.Keys);      
+        List<ulong> knownIds = new List<ulong>(_bodies.Keys);      
 
         Kinect.Body closestBody = FindClosestBody(data);
 
@@ -137,25 +142,25 @@ public class BodySourceView : MonoBehaviour
         {
             if (!trackedIds.Contains(trackingId))
             {
-                Destroy(_Bodies[trackingId]);
-                _Bodies.Remove(trackingId);
+                Destroy(_bodies[trackingId]);
+                _bodies.Remove(trackingId);
             }
             // delete bodies that aren't the closest
             if (trackingId != closestBody.TrackingId)
             {
                 Destroy(GameObject.Find("Body:" + trackingId));
-                _Bodies.Remove(trackingId);
+                _bodies.Remove(trackingId);
             }
         }
 
         if (closestBody.IsTracked)
         {
-            if (!_Bodies.ContainsKey(closestBody.TrackingId))
+            if (!_bodies.ContainsKey(closestBody.TrackingId))
             {
-                _Bodies[closestBody.TrackingId] = CreateBodyObject(closestBody, closestBody.TrackingId);
+                _bodies[closestBody.TrackingId] = CreateHands(closestBody, closestBody.TrackingId);
             }
 
-            RefreshBodyObject(closestBody, _Bodies[closestBody.TrackingId], (long) closestBody.TrackingId);
+            RefreshHands(closestBody, _bodies[closestBody.TrackingId], (long) closestBody.TrackingId);
         }
         
         //foreach (var body in data)
@@ -181,7 +186,7 @@ public class BodySourceView : MonoBehaviour
     {
         GameObject body = new GameObject("Body:" + id);
 
-        if (addRigidBody)
+        if (AddRigidBody)
         {
             body.AddComponent<Rigidbody>();
             body.transform.position = new Vector3(0, 5, 0);
@@ -193,14 +198,16 @@ public class BodySourceView : MonoBehaviour
             GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
             jointObj.name = jt.ToString();
+            Rigidbody rb = jointObj.AddComponent<Rigidbody>();
+            rb.useGravity = false;
             jointObj.transform.parent = body.transform;
 
-            if (addLines)
+            if (AddLines)
             {
                 LineRenderer lr = jointObj.AddComponent<LineRenderer>();
                 lr.SetVertexCount(2);
-                lr.material = BoneMaterial;
-                lr.SetWidth(1f, 1f);
+                lr.material = HandMaterial;
+                lr.SetWidth(0.2f, 0.2f);
             }
 
             if (jt == Kinect.JointType.Head)
@@ -210,12 +217,10 @@ public class BodySourceView : MonoBehaviour
 
         }
 
-        mainCamera.GetComponent<DepthOfField>().focalTransform = GameObject.Find("SpineBase").transform;
+        MainCamera.GetComponent<DepthOfField>().focalTransform = GameObject.Find("SpineBase").transform;
 
-        maxHeight = (GetVector3FromJoint(kinectBody.Joints[Kinect.JointType.Head]) - GetVector3FromJoint(kinectBody.Joints[Kinect.JointType.FootLeft])).sqrMagnitude;
+        _maxHeight = (GetVector3FromJoint(kinectBody.Joints[Kinect.JointType.Head]) - GetVector3FromJoint(kinectBody.Joints[Kinect.JointType.FootLeft])).sqrMagnitude;
 
-        trail = GameObject.Find("Trail");
-        trail.GetComponent<TrailRenderer>().enabled = false;
         return body;
     }
 
@@ -228,24 +233,24 @@ public class BodySourceView : MonoBehaviour
             Kinect.Joint sourceJoint = body.Joints[jt];
             Kinect.Joint? targetJoint = null;
 
-            if (_BoneMap.ContainsKey(jt))
+            if (_boneMap.ContainsKey(jt))
             {
-                targetJoint = body.Joints[_BoneMap[jt]];
+                targetJoint = body.Joints[_boneMap[jt]];
             }
-
+           
             if (jt == Kinect.JointType.FootLeft)
             {
-                groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft]).y);
+                _groundPositionY = Mathf.Min(_groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft]).y);
             }
             if (jt == Kinect.JointType.FootRight)
             {
-                groundPositionY = Mathf.Min(groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
+                _groundPositionY = Mathf.Min(_groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
             }
             
             Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
-
-            if (addLines)
+            
+            if (AddLines)
             {
                 LineRenderer lr = jointObj.GetComponent<LineRenderer>();
                 if (targetJoint.HasValue)
@@ -261,115 +266,296 @@ public class BodySourceView : MonoBehaviour
             }
 
         }
-        if (controlType == "trail")
-        {
-            var pos = GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
-            trail.transform.position = pos;
-
-        }
-        if (controlType.ToLower() == "cylinder" && bodyControllerViz != null)
+       
+        if (_controlType.ToLower() == "cylinder" && BodyControllerViz != null)
         {
             Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
             float width = handWidth.sqrMagnitude;
-            maxArmWidth = Mathf.Max(width, maxArmWidth);
+            _maxArmWidth = Mathf.Max(width, _maxArmWidth);
             float angle = Vector3.Angle(handWidth, transform.right);
             //Debug.Log("distance: " + width);
             //Debug.Log("maxArmWidth: " + maxArmWidth);
             //Debug.Log("volume: " + width / maxArmWidth);
             // compute log scale from linear scale
             // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
-            float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
+            float widthLog = (Mathf.Log(width)) / (Mathf.Log(_maxArmWidth));
 
-            bodyControllerViz.transform.localScale = new Vector3(0.2f, handWidth.magnitude / 4, 0.2f);
-            bodyControllerViz.transform.rotation = Quaternion.LookRotation(handWidth) * Quaternion.Euler(90, 0, 0);
-            bodyControllerViz.transform.position = getCenterPosition(body);
+            BodyControllerViz.transform.localScale = new Vector3(0.2f, handWidth.magnitude / 4, 0.2f);
+            BodyControllerViz.transform.rotation = Quaternion.LookRotation(handWidth) * Quaternion.Euler(90, 0, 0);
+            BodyControllerViz.transform.position = GetCenterPosition(body);
 
-            oscControl.SendOSC(_oscPaths[0], widthLog);
-            oscControl.SendOSC(_oscPaths[1], angle / 180f);
+            _oscControl.SendOSC(_oscPaths[0], widthLog);
+            _oscControl.SendOSC(_oscPaths[1], angle / 180f);
         }
-        if (controlType.ToLower() == "stick" && bodyControllerViz != null)
+        if (_controlType.ToLower() == "stick" && BodyControllerViz != null)
         {
             Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
             Vector3 handHeight;
             Vector3 midpoint;
-            if (bodySide == "right")
+            if (BodySide == "right")
             {
                 handHeight = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]);
                 midpoint = GetMidpointOfVectors(body.Joints[Kinect.JointType.HandRight], body.Joints[Kinect.JointType.FootRight]);
-                handState = body.HandRightState;
+                _handState = body.HandRightState;
             } else
             {
                 handHeight = GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]) - GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft]);
                 midpoint = GetMidpointOfVectors(body.Joints[Kinect.JointType.HandLeft], body.Joints[Kinect.JointType.FootLeft]);
-                handState = body.HandLeftState;
+                _handState = body.HandLeftState;
             }
             float height = handHeight.sqrMagnitude;
-            maxHeight = Mathf.Max(height, maxHeight);
+            _maxHeight = Mathf.Max(height, _maxHeight);
             float angle = Vector3.Angle(handHeight, transform.right);
-            float heightLog = (Mathf.Log(height)) / (Mathf.Log(maxHeight));
+            float heightLog = (Mathf.Log(height)) / (Mathf.Log(_maxHeight));
 
-            bodyControllerViz.transform.localScale = new Vector3(0.2f, handHeight.magnitude / 4, 0.2f);
-            bodyControllerViz.transform.rotation = Quaternion.LookRotation(handHeight) * Quaternion.Euler(90, 0, 0);
-            bodyControllerViz.transform.position = midpoint;
+            BodyControllerViz.transform.localScale = new Vector3(0.2f, handHeight.magnitude / 4, 0.2f);
+            BodyControllerViz.transform.rotation = Quaternion.LookRotation(handHeight) * Quaternion.Euler(90, 0, 0);
+            BodyControllerViz.transform.position = midpoint;
 
-            if (useHandState)
+            if (UseHandState)
             {
-                if (handState == Kinect.HandState.Closed && handHasOpened)
+                if (_handState == Kinect.HandState.Closed && _handHasOpened)
                 {
-                    oscControl.SendOSC(_oscPaths[0], (height / maxHeight) * 128f, 0.5f);
-                    oscControl.SendOSC(_oscPaths[1], angle / 180f);
-                    handHasOpened = false;
-                    Debug.Log("send note: " + (height / maxHeight) * 128f);
+                    _oscControl.SendOSC(_oscPaths[0], (height / _maxHeight) * 128f, 0.5f);
+                    _handHasOpened = false;
+                    Debug.Log("send note: " + (height / _maxHeight) * 128f);
                 }
-                else if (handState == Kinect.HandState.Open)
+                else if (_handState == Kinect.HandState.Open)
                 {
-                    handHasOpened = true;
+                    _handHasOpened = true;
                 }
             } else {
-                if (handWidth.sqrMagnitude < clapWidth && handHasOpened)
+                if (handWidth.sqrMagnitude < ClapWidth && _handHasOpened)
                 {
-                    oscControl.SendOSC(_oscPaths[0], (height / maxHeight) * 128f, 0.1f);
-                    handHasOpened = false;
+                    _oscControl.SendOSC(_oscPaths[0], (height / _maxHeight) * 128f, 0.1f);
+                    _handHasOpened = false;
                 }
-                else if (handWidth.sqrMagnitude >= clapWidth)
+                else if (handWidth.sqrMagnitude >= ClapWidth)
                 {
-                    handHasOpened = true;
+                    _handHasOpened = true;
                 }
-               
             }
+            Debug.Log("stick rotation angle: " + angle + ", " + Mathf.Clamp(((angle - 45f) / 90f) * 127f, 0f, 127f));
+            _oscControl.SendOSC(_oscPaths[1], Mathf.Clamp(((angle - 45f) / 90f) * 127f, 0f, 127f));
+
         }
-        if (controlType.ToLower() == "sphere" && bodyControllerViz != null)
+        if (_controlType.ToLower() == "sphere" && BodyControllerViz != null)
         {
-            float width = getHandWidth(body);
-            maxArmWidth = Mathf.Max(width, maxArmWidth);
-            float angle = getHandAngle(body);
-            float depth = getHandDepthFromBody(body);
-            maxHandDepth = Mathf.Max(depth, maxHandDepth);
+            float width = GetHandWidth(body);
+            _maxArmWidth = Mathf.Max(width, _maxArmWidth);
+            float angle = GetHandAngle(body);
+            float depth = GetHandDepthFromBody(body);
+            _maxHandDepth = Mathf.Max(depth, _maxHandDepth);
 
             //Debug.Log("distance: " + width);
             //Debug.Log("maxArmWidth: " + maxArmWidth);
             //Debug.Log("volume: " + width / maxArmWidth);
             //Debug.Log("depth: " + depth / maxHandDepth);
 
-            float widthLog = (Mathf.Log(width)) / (Mathf.Log(maxArmWidth));
-            float depthLog = (Mathf.Log(depth)) / (Mathf.Log(maxHandDepth));
+            float widthLog = (Mathf.Log(width)) / (Mathf.Log(_maxArmWidth));
+            float depthLog = (Mathf.Log(depth)) / (Mathf.Log(_maxHandDepth));
 
-            bodyControllerViz.transform.localScale = new Vector3(width / 2, width / 2, width / 2);
-            bodyControllerViz.transform.rotation = Quaternion.LookRotation(GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]));
-            bodyControllerViz.transform.position = getCenterPosition(body);
+            BodyControllerViz.transform.localScale = new Vector3(width / 2, width / 2, width / 2);
+            BodyControllerViz.transform.rotation = Quaternion.LookRotation(GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]));
+            BodyControllerViz.transform.position = GetCenterPosition(body);
 
-            oscControl.SendOSC(_oscPaths[0], widthLog);
-            oscControl.SendOSC(_oscPaths[1], angle / 180f);
-            oscControl.SendOSC(_oscPaths[2], depthLog);
+            _oscControl.SendOSC(_oscPaths[0], widthLog);
+            _oscControl.SendOSC(_oscPaths[1], angle / 180f);
+            _oscControl.SendOSC(_oscPaths[2], depthLog);
         }
     }
 
+    private GameObject CreateHands(Kinect.Body kinectBody, ulong id)
+    {
+        GameObject body = new GameObject("Body:" + id);
+        Kinect.JointType[] handJoints = {
+            Kinect.JointType.HandLeft, Kinect.JointType.HandRight
+        };
+        if (AddRigidBody)
+        {
+            body.AddComponent<Rigidbody>();
+            body.transform.position = new Vector3(0, 5, 0);
+            body.GetComponent<Rigidbody>().freezeRotation = true;
+        }
+        Vector3 initPos = new Vector3(0, 0, 0);
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        {
+            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            jointObj.name = jt.ToString();
+            Rigidbody rb = jointObj.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            jointObj.transform.GetComponent<MeshRenderer>().enabled = false;
+            foreach (Kinect.JointType j in handJoints)
+            {
+                if (j.ToString() == jt.ToString())
+                {
+                    jointObj.transform.GetComponent<MeshRenderer>().enabled = true;
+                    jointObj.transform.GetComponent<MeshRenderer>().material = HandMaterial;
+                    jointObj.transform.localScale = new Vector3(3f, 3f, 3f);
+                }
+
+            }
+            jointObj.transform.parent = body.transform;
+
+            if (AddLines)
+            {
+                
+                GameObject psObject = Instantiate(ParticleSystem, initPos, Quaternion.identity) as GameObject;
+                ParticleSystem ps = psObject.GetComponent<ParticleSystem>();
+                ps.Play();
+                psObject.transform.localScale = new Vector3(1f, 1f, 1f);
+                psObject.transform.parent = jointObj.transform;
+
+            }
+
+        }
+
+        MainCamera.GetComponent<DepthOfField>().focalTransform = GameObject.Find("HandLeft").transform;
+
+        _maxHeight = (GetVector3FromJoint(kinectBody.Joints[Kinect.JointType.Head]) - GetVector3FromJoint(kinectBody.Joints[Kinect.JointType.FootLeft])).sqrMagnitude;
+
+        return body;
+    }
+
+
+    private void RefreshHands(Kinect.Body body, GameObject bodyObject, long trackingId)
+    {
+
+//        Kinect.JointType[] handJoints = {
+//            Kinect.JointType.HandLeft, Kinect.JointType.HandRight
+//        };
+//        foreach (Kinect.JointType hand in handJoints)
+//        {
+//            Kinect.Joint sourceJoint = body.Joints[hand];
+//
+//            Transform jointObj = bodyObject.transform.FindChild(hand.ToString());
+//            jointObj.localPosition = GetVector3FromJoint(sourceJoint);
+//
+//        }
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        {
+            Kinect.Joint sourceJoint = body.Joints[jt];
+
+            if (jt == Kinect.JointType.FootLeft)
+            {
+                _groundPositionY = Mathf.Min(_groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft]).y);
+            }
+            if (jt == Kinect.JointType.FootRight)
+            {
+                _groundPositionY = Mathf.Min(_groundPositionY, GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]).y);
+            }
+
+            Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
+            jointObj.localPosition = GetVector3FromJoint(sourceJoint);
+
+        }
+        if (_controlType.ToLower() == "cylinder" && BodyControllerViz != null)
+        {
+            Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+            float width = handWidth.sqrMagnitude;
+            _maxArmWidth = Mathf.Max(width, _maxArmWidth);
+            float angle = Vector3.Angle(handWidth, transform.right);
+            //Debug.Log("distance: " + width);
+            //Debug.Log("maxArmWidth: " + maxArmWidth);
+            //Debug.Log("volume: " + width / maxArmWidth);
+            // compute log scale from linear scale
+            // x'i = (log(xi)-log(xmin)) / (log(xmax)-log(xmin))​
+            float widthLog = (Mathf.Log(width)) / (Mathf.Log(_maxArmWidth));
+
+            BodyControllerViz.transform.localScale = new Vector3(0.2f, handWidth.magnitude / 4, 0.2f);
+            BodyControllerViz.transform.rotation = Quaternion.LookRotation(handWidth) * Quaternion.Euler(90, 0, 0);
+            BodyControllerViz.transform.position = GetCenterPosition(body);
+
+            _oscControl.SendOSC(_oscPaths[0], widthLog);
+            _oscControl.SendOSC(_oscPaths[1], angle / 180f);
+        }
+        if (_controlType.ToLower() == "stick" && BodyControllerViz != null)
+        {
+            Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
+            Vector3 handHeight;
+            Vector3 midpoint;
+            if (BodySide == "right")
+            {
+                handHeight = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.FootRight]);
+                midpoint = GetMidpointOfVectors(body.Joints[Kinect.JointType.HandRight], body.Joints[Kinect.JointType.FootRight]);
+                _handState = body.HandRightState;
+            }
+            else
+            {
+                handHeight = GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]) - GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft]);
+                midpoint = GetMidpointOfVectors(body.Joints[Kinect.JointType.HandLeft], body.Joints[Kinect.JointType.FootLeft]);
+                _handState = body.HandLeftState;
+            }
+            float height = handHeight.sqrMagnitude;
+            _maxHeight = Mathf.Max(height, _maxHeight);
+            float angle = Vector3.Angle(handHeight, transform.right);
+            float heightLog = (Mathf.Log(height)) / (Mathf.Log(_maxHeight));
+
+            BodyControllerViz.transform.localScale = new Vector3(0.2f, handHeight.magnitude / 4, 0.2f);
+            BodyControllerViz.transform.rotation = Quaternion.LookRotation(handHeight) * Quaternion.Euler(90, 0, 0);
+            BodyControllerViz.transform.position = midpoint;
+
+            if (UseHandState)
+            {
+                if (_handState == Kinect.HandState.Closed && _handHasOpened)
+                {
+                    _oscControl.SendOSC(_oscPaths[0], (height / _maxHeight) * 128f, 0.5f);
+                    _handHasOpened = false;
+                    Debug.Log("send note: " + (height / _maxHeight) * 128f);
+                }
+                else if (_handState == Kinect.HandState.Open)
+                {
+                    _handHasOpened = true;
+                }
+            }
+            else
+            {
+                if (handWidth.sqrMagnitude < ClapWidth && _handHasOpened)
+                {
+                    _oscControl.SendOSC(_oscPaths[0], (height / _maxHeight) * 128f, 0.1f);
+                    _handHasOpened = false;
+                }
+                else if (handWidth.sqrMagnitude >= ClapWidth)
+                {
+                    _handHasOpened = true;
+                }
+            }
+            Debug.Log("stick rotation angle: " + angle + ", " + Mathf.Clamp(((angle - 45f) / 90f) * 127f, 0f, 127f));
+            _oscControl.SendOSC(_oscPaths[1], Mathf.Clamp(((angle - 45f) / 90f) * 127f, 0f, 127f));
+
+        }
+        if (_controlType.ToLower() == "sphere" && BodyControllerViz != null)
+        {
+            float width = GetHandWidth(body);
+            _maxArmWidth = Mathf.Max(width, _maxArmWidth);
+            float angle = GetHandAngle(body);
+            float depth = GetHandDepthFromBody(body);
+            _maxHandDepth = Mathf.Max(depth, _maxHandDepth);
+
+            //Debug.Log("distance: " + width);
+            //Debug.Log("maxArmWidth: " + maxArmWidth);
+            //Debug.Log("volume: " + width / maxArmWidth);
+            //Debug.Log("depth: " + depth / maxHandDepth);
+
+            float widthLog = (Mathf.Log(width)) / (Mathf.Log(_maxArmWidth));
+            float depthLog = (Mathf.Log(depth)) / (Mathf.Log(_maxHandDepth));
+
+            BodyControllerViz.transform.localScale = new Vector3(width / 2, width / 2, width / 2);
+            BodyControllerViz.transform.rotation = Quaternion.LookRotation(GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]));
+            BodyControllerViz.transform.position = GetCenterPosition(body);
+
+            _oscControl.SendOSC(_oscPaths[0], widthLog);
+            _oscControl.SendOSC(_oscPaths[1], angle / 180f);
+            _oscControl.SendOSC(_oscPaths[2], depthLog);
+        }
+    }
     /// <summary>
     /// Set OSC Paths used by controllers
     ///
     /// </summary>
     /// <param name="oscPaths"></param>
-    public void SetOSCPaths(List<string> oscPaths)
+    public void SetOscPaths(List<string> oscPaths)
     {
 
         Debug.Log("OSC Paths before:" + _oscPaths.Count);
@@ -381,7 +567,7 @@ public class BodySourceView : MonoBehaviour
         Debug.Log("OSC Paths after:" + _oscPaths.Count);
     }
 
-    Vector3 getCenterPosition(Kinect.Body body)
+    Vector3 GetCenterPosition(Kinect.Body body)
     {
         Vector3 midPoint = ((GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft])) * 0.5f) + GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         return midPoint;
@@ -398,7 +584,7 @@ public class BodySourceView : MonoBehaviour
     /// </summary>
     /// <param name="body"></param>
     /// <returns>float between left and right hand</returns>
-    float getHandWidth(Kinect.Body body)
+    float GetHandWidth(Kinect.Body body)
     {
         Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         return handWidth.magnitude;
@@ -409,14 +595,14 @@ public class BodySourceView : MonoBehaviour
     /// </summary>
     /// <param name="handWidth"></param>
     /// <returns>float</returns>
-    float getHandAngle(Kinect.Body body)
+    float GetHandAngle(Kinect.Body body)
     {
         Vector3 handWidth = GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         float angle = Vector3.Angle(handWidth, transform.right);
         return angle;
     }
 
-    float getHandDepthFromBody(Kinect.Body body)
+    float GetHandDepthFromBody(Kinect.Body body)
     {
         Vector3 leftHandDepth = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineShoulder]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandLeft]);
         Vector3 rightHandDepth = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineShoulder]) - GetVector3FromJoint(body.Joints[Kinect.JointType.HandRight]);
@@ -479,7 +665,7 @@ public class BodySourceView : MonoBehaviour
 
     public void SetControlType(string ct)
     {
-        controlType = ct;
+        _controlType = ct;
 
     }
 
@@ -498,8 +684,9 @@ public class BodySourceView : MonoBehaviour
         }
     }
 
-    private static Vector3 GetVector3FromJoint(Kinect.Joint joint)
+    private Vector3 GetVector3FromJoint(Kinect.Joint joint)
     {
-        return new Vector3(joint.Position.X * 10, joint.Position.Y * 10, joint.Position.Z * 10);
+        float z = Mirrored ? joint.Position.Z * 10 : ((-joint.Position.Z * 10) + ZOffset);
+        return new Vector3(joint.Position.X * 10, joint.Position.Y * 10, z);
     }
 }

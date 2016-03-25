@@ -13,16 +13,16 @@ namespace BigEyes
 {
 	public class OSCController : MonoBehaviour
 	{
-		public OscOut oscOut;
-        public string IPAddress;
-        public int port;
+		public OscOut OscOut;
+        public string IpAddress;
+        public int Port;
 
-        public bool controllerActive = false;
+        public bool ControllerActive = false;
 
 		void Start()
 		{
 			// Ensure that we have a OscOut component.
-			if( !oscOut ) oscOut = gameObject.AddComponent<OscOut>();
+			if( !OscOut ) OscOut = gameObject.AddComponent<OscOut>();
 
             // Prepare for sending messages to applications on this device on port 7000.
             //oscOut.Open( port );
@@ -36,8 +36,16 @@ namespace BigEyes
             // Or to a multicast group (Multicast).
             //oscOut.Open( 7000, "224.1.1.101" );
 
-            oscOut.Open(port, IPAddress);
-		}
+            OscOut.Open(Port, IpAddress);
+
+            // Init some Ableton Live stuff
+            // Init loop length of Midi Loopers
+            SendOSC("/be/track/1/loop/1/length", 0.2f);
+            SendOSC("/be/track/2/loop/1/length", 0.2f);
+            SendOSC("/be/track/3/loop/1/length", 0.2f);
+            SendOSC("/be/track/4/loop/1/length", 0.2f);
+            SendOSC("/be/track/5/loop/1/length", 0.2f);
+        }
 
 
 		void Update()
@@ -58,12 +66,17 @@ namespace BigEyes
 
         public void SendOSC(string oscPath, float value)
         {
-            oscOut.Send(oscPath, value);
+            OscOut.Send(oscPath, value);
 
         }
         public void SendOSC(string oscPath, float value, float value2)
         {
-            oscOut.Send(oscPath, value, value2);
+            OscOut.Send(oscPath, value, value2);
+
+        }
+        public void SendOSC(string oscPath, int value, int value2)
+        {
+            OscOut.Send(oscPath, value, value2);
 
         }
     }

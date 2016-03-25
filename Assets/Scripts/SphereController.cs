@@ -5,20 +5,20 @@ using System.Timers;
 public class SphereController : OSCBodyController
 {
 
-    public string widthControlPath = "/clank/pan";
-    public string rotationControlPath = "/clank/reverb";
-    public string depthControlPath = "/clank/volume";
-    public float velocity = -10f;
+    public string WidthControlPath = "/clank/pan";
+    public string RotationControlPath = "/clank/reverb";
+    public string DepthControlPath = "/clank/volume";
+    public float Velocity = -10f;
 
     // Use this for initialization
     void Start()
     {
-        controlType = "sphere";
-        oscPaths.Add(widthControlPath);
-        oscPaths.Add(rotationControlPath);
-        oscPaths.Add(depthControlPath);
+        ControlType = "sphere";
+        OscPaths.Add(WidthControlPath);
+        OscPaths.Add(RotationControlPath);
+        OscPaths.Add(DepthControlPath);
 
-        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, (Random.value * velocity) + velocity));
+        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, (Random.value * Velocity) + Velocity));
     }
 
 }

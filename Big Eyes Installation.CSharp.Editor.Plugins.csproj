@@ -123,6 +123,9 @@
     <Reference Include="VacuumShaders.MeshMaterializer">
       <HintPath>Assets\VacuumShaders\Mesh Materializer\Scripts\VacuumShaders.MeshMaterializer.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-UnityScript">
+      <HintPath>Library\ScriptAssemblies\Assembly-UnityScript.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Big Eyes Installation.CSharp.Plugins.csproj">
@@ -140,9 +143,15 @@
     <Compile Include="Assets\Standard Assets\Editor\KinectVisualGestureBuilderPostBuildCopyPluginData.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\AVProMovieCapture\Shaders\AVProMovieCapture_RGBA2YCbCr.shader" />
+    <None Include="Assets\AVProMovieCapture\Shaders\AVProMovieCapture_RedBlueSwap.shader" />
+    <None Include="Assets\AVProMovieCapture\Shaders\AVProMovieCapture_Shared.cginc" />
+    <None Include="Assets\Game Jam Menu Template\Fonts\OpenSans\License!.txt" />
+    <None Include="Assets\Game Jam Menu Template\GameJamTemplateReadMe.txt" />
     <None Include="Assets\GreenScreen\Materials\GreenScreenShader.shader" />
     <None Include="Assets\KinectDemos\RecorderDemo\Resources\PlayerGrammar.grxml.txt" />
     <None Include="Assets\OSC simpl\Documents\Versions.txt" />
+    <None Include="Assets\Plugins\Pixelplacement\iTween\ReadMe!\ReadMe!.txt" />
     <None Include="Assets\Plugins\x86\NuiDatabase\Expression\NuiExpressionModelManifest.txt" />
     <None Include="Assets\Plugins\x86\NuiDatabase\HDFaceTracker\AAMModel\Map2D3D_F.txt" />
     <None Include="Assets\Plugins\x86\NuiDatabase\HDFaceTracker\AAMModel\Map2D3D_HLP.txt" />
@@ -355,6 +364,7 @@
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Opaque.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Transparent.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\One Directional Light\Diffuse_Transparent_2Pass.shader" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\SpeedTree\SpeedTree.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Standard\Standard.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Standard\StandardSpecular.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Cutout.shader" />
@@ -362,6 +372,7 @@
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Transparent.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\Unlit\Unlit_Transparent_2Pass.shader" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_ODL.cginc" />
+    <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_SpeedTreeCommon.cginc" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_UnityStandardCore.cginc" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_UnityStandardInput.cginc" />
     <None Include="Assets\VacuumShaders\Vertex Color\Shaders\cginc\VertexColor_Unlit.cginc" />

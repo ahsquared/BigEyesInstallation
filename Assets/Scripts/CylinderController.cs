@@ -5,18 +5,18 @@ using System.Timers;
 public class CylinderController : OSCBodyController
 {
 
-    public string widthControlPath = "/clank/volume";
-    public string rotationControlPath = "/clank/reverb";
-    public float velocity = -10f;
+    public string WidthControlPath = "/clank/volume";
+    public string RotationControlPath = "/clank/reverb";
+    public float Velocity = -10f;
 
     // Use this for initialization
     void Start()
     {
-        controlType = "cylinder";
-        oscPaths.Add(widthControlPath);
-        oscPaths.Add(rotationControlPath);
+        ControlType = "cylinder";
+        OscPaths.Add(WidthControlPath);
+        OscPaths.Add(RotationControlPath);
 
-        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, (Random.value * velocity) + velocity));
+        gameObject.GetComponent<Rigidbody>().velocity = transform.TransformDirection(new Vector3(0, 0, (Random.value * Velocity) + Velocity));
     }
 }
 

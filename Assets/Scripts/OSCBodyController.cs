@@ -2,35 +2,36 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
+using BigEyes;
 
 public class OSCBodyController : MonoBehaviour {
 
-    public BigEyes.OSCController oscController;
-    public BodySourceView _bodySourceView;
-    public string controlType;
-    public List<string> oscPaths = new List<string>();
+    public OSCController OscController;
+    public BodySourceView BodySourceView;
+    public string ControlType;
+    public List<string> OscPaths = new List<string>();
 
-    public GameObject visualizer;
+    public GameObject Visualizer;
 
-    public int maxTime = 100;
-    public int time;
+    public int MaxTime = 100;
+    public int Time;
 
-    public Text timerText;
+    public Text TimerText;
 
     // Use this for initialization
     void Awake()
     {
-        oscController = GameObject.Find("OSC").GetComponent<BigEyes.OSCController>();
-        _bodySourceView = GameObject.Find("Body View").GetComponent<BodySourceView>();
-        time = maxTime;
+        OscController = GameObject.Find("OSC").GetComponent<OSCController>();
+        BodySourceView = GameObject.Find("Body View").GetComponent<BodySourceView>();
+        Time = MaxTime;
         
     } 
     
     void Start()
     {
-        if (_bodySourceView == null)
+        if (BodySourceView == null)
         {
-            _bodySourceView = GameObject.Find("Body View").GetComponent<BodySourceView>();
+            BodySourceView = GameObject.Find("Body View").GetComponent<BodySourceView>();
         }
     }
 

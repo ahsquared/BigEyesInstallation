@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Big Eyes Scenes/Big Eyes - 20160306.unity
+- path: Assets/Big Eyes Scenes/Big Eyes - 20160322.unity
   isLoaded: 1
   isActive: 1
