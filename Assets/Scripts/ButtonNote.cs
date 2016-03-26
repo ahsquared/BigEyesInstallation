@@ -57,9 +57,9 @@ public class ButtonNote : MonoBehaviour {
             _playing = true;
             _colliderName = other.name;
             //velocityF = Mathf.Clamp(Mathf.Abs(other.GetComponent<Rigidbody>().velocity.magnitude) * 100, 0, 128f);
-            //Debug.Log("velocity: " + velocityF);
-            _originalColor = _mat.color;
-            _mat.color = new Color(255f, 0f, 0f);
+            Debug.Log("velocity: " + other.GetComponent<Rigidbody>().velocity.magnitude);
+            //_originalColor = _mat.color;
+            //_mat.color = new Color(255f, 0f, 0f);
             SendAllControllerMessages(MaxVal);
             _trackNumber = _instrumentState.TrackNumber;
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture));
@@ -103,7 +103,7 @@ public class ButtonNote : MonoBehaviour {
         if ((other.name == _colliderName) && _playing)
         {
             _playing = false;
-            _mat.color = _originalColor;
+            //_mat.color = _originalColor;
             _trackNumber = _instrumentState.TrackNumber;
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture));
             SendNote(msgPath, Note, 0);

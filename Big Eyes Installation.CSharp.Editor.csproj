@@ -163,6 +163,7 @@
     <Compile Include="Assets\OSC simpl\Base\Internal\Editor\OscInInspector.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Editor\OscMappingDrawer.cs" />
     <Compile Include="Assets\OSC simpl\Base\Internal\Editor\OscOutInspector.cs" />
+    <Compile Include="Assets\Settings And Controls\Editor\SettingsAndControlsEditor.cs" />
     <Compile Include="Assets\VacuumShaders\Vertex Color\Editor\VertexColor_MaterialEditor.cs" />
     <Compile Include="Assets\VolumetricLines\Scripts\Editor\ExposeProperties.cs" />
     <Compile Include="Assets\VolumetricLines\Scripts\Editor\VolumetricLineBehaviorEditor.cs" />
@@ -222,6 +223,8 @@
     <None Include="Assets\Resources\Dilate.shader" />
     <None Include="Assets\Resources\Erode.shader" />
     <None Include="Assets\Resources\SpeechGrammar.grxml.txt" />
+    <None Include="Assets\Scripts\IniFile\Readme.txt" />
+    <None Include="Assets\Settings And Controls\ReadMe.txt" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

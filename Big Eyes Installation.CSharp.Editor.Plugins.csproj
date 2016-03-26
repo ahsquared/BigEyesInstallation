@@ -194,6 +194,8 @@
     <None Include="Assets\Resources\Dilate.shader" />
     <None Include="Assets\Resources\Erode.shader" />
     <None Include="Assets\Resources\SpeechGrammar.grxml.txt" />
+    <None Include="Assets\Scripts\IniFile\Readme.txt" />
+    <None Include="Assets\Settings And Controls\ReadMe.txt" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

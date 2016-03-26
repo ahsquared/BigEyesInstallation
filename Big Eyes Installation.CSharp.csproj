@@ -226,6 +226,8 @@
     <Compile Include="Assets\Scripts\ControllerTrigger.cs" />
     <Compile Include="Assets\Scripts\CylinderController.cs" />
     <Compile Include="Assets\Scripts\Helpers.cs" />
+    <Compile Include="Assets\Scripts\IniFile\Demo\IniFile_DemoScript.cs" />
+    <Compile Include="Assets\Scripts\IniFile\IniFile.cs" />
     <Compile Include="Assets\Scripts\InstrumentState.cs" />
     <Compile Include="Assets\Scripts\LightingControl.cs" />
     <Compile Include="Assets\Scripts\LookAtCamera.cs" />
@@ -238,6 +240,9 @@
     <Compile Include="Assets\Scripts\SetTrackNumber.cs" />
     <Compile Include="Assets\Scripts\SphereController.cs" />
     <Compile Include="Assets\Scripts\StickController.cs" />
+    <Compile Include="Assets\Settings And Controls\Scripts\EventHandlerExample.cs" />
+    <Compile Include="Assets\Settings And Controls\Scripts\SettingsAndControls.cs" />
+    <Compile Include="Assets\Settings And Controls\Scripts\SettingsExample.cs" />
     <Compile Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Scripts\Runtime.cs" />
     <Compile Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Scripts\Runtime_FacetedTerrain.cs" />
     <Compile Include="Assets\VacuumShaders\Mesh Materializer\Example Scenes\Files\Scripts\Runtime_MeshCombine.cs" />
@@ -353,6 +358,8 @@
     <None Include="Assets\Resources\Dilate.shader" />
     <None Include="Assets\Resources\Erode.shader" />
     <None Include="Assets\Resources\SpeechGrammar.grxml.txt" />
+    <None Include="Assets\Scripts\IniFile\Readme.txt" />
+    <None Include="Assets\Settings And Controls\ReadMe.txt" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
