@@ -5,8 +5,9 @@ using System.Linq;
 using BigEyes;
 using UnityEngine.UI;
 
-public class OSCButtonToggle : MonoBehaviour {
-	
+public class OSCButtonToggle : MonoBehaviour
+{
+
     private OscOut _oscOut;
     public string OscMessagePath;
     public float OffValue = 0f;
@@ -22,6 +23,7 @@ public class OSCButtonToggle : MonoBehaviour {
     private Color _activeColor = new Color(33f / 255f, 77f / 255f, 178f / 255f);
     private Image _image;
     private GameObject _imageActive;
+    private GameObject _text;
 
     private LightingControl[] _spotLights;
 
@@ -31,7 +33,9 @@ public class OSCButtonToggle : MonoBehaviour {
         if (!_instrumentState) _instrumentState = GameObject.Find("InstrumentUI").GetComponent<InstrumentState>();
         _image = Helpers.GetChildGameObjectByName(gameObject, "Image").GetComponent<Image>();
         _imageActive = Helpers.GetChildGameObjectByName(gameObject, "ImageActive");
+        _text = Helpers.GetChildGameObjectByName(gameObject, "Text");
         if (_imageActive) _imageActive.SetActive(false);
+        if (_text) _text.SetActive(false);
         _originalColor = _image.color;
         _spotLights = GameObject.Find("SpotLights").GetComponentsInChildren<LightingControl>();
     }
@@ -39,7 +43,7 @@ public class OSCButtonToggle : MonoBehaviour {
 
     void Update()
     {
-        
+
     }
 
     void OnTriggerEnter(Collider other)
@@ -57,6 +61,8 @@ public class OSCButtonToggle : MonoBehaviour {
             _debouncing = true;
             _debouncingWait = true;
             _image.color = _toggleState ? _activeColor : _originalColor;
+            _imageActive.SetActive(_toggleState);
+            _text.SetActive(_toggleState);
             StartCoroutine("Debounce");
             Debug.Log("send osc to: " + OscMessagePath + ", val: " + value);
 
@@ -74,18 +80,17 @@ public class OSCButtonToggle : MonoBehaviour {
         }
     }
 
-    void OnTriggerExit(Collider other)
-    {
-        if ((other.name == "HandLeft" || other.name == "HandRight" ||
-            other.name == "WristLeft" || other.name == "WristRight" ||
-            other.name == "ThumbLeft" || other.name == "ThumbRight" ||
-            other.name == "HandTipLeft" || other.name == "HandTipRight") && !_debouncing)
-        {
-            // stop the particles
-            //gameObject.GetComponent<ParticleSystem>().Stop();
-
-        }
-    }
+//    void OnTriggerExit(Collider other)
+//    {
+//        if ((other.name == "HandLeft" || other.name == "HandRight" ||
+//            other.name == "WristLeft" || other.name == "WristRight" ||
+//            other.name == "ThumbLeft" || other.name == "ThumbRight" ||
+//            other.name == "HandTipLeft" || other.name == "HandTipRight") && !_debouncing)
+//        {
+//            _imageActive.SetActive(_toggleState);
+//            _text.SetActive(_toggleState);
+//        }
+//    }
 
     public void SendOsc(string oscPath, float value)
     {

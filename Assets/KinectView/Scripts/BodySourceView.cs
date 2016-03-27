@@ -158,6 +158,7 @@ public class BodySourceView : MonoBehaviour
             if (!_bodies.ContainsKey(closestBody.TrackingId))
             {
                 _bodies[closestBody.TrackingId] = CreateHands(closestBody, closestBody.TrackingId);
+                _oscControl.SendOSC("/be/play", 1f);
             }
 
             RefreshHands(closestBody, _bodies[closestBody.TrackingId], (long) closestBody.TrackingId);
@@ -392,7 +393,7 @@ public class BodySourceView : MonoBehaviour
                 {
                     jointObj.transform.GetComponent<MeshRenderer>().enabled = true;
                     jointObj.transform.GetComponent<MeshRenderer>().material = HandMaterial;
-                    jointObj.transform.localScale = new Vector3(3f, 3f, 3f);
+                    jointObj.transform.localScale = new Vector3(1f, 1f, 1f);
                 }
 
             }
@@ -686,7 +687,7 @@ public class BodySourceView : MonoBehaviour
 
     private Vector3 GetVector3FromJoint(Kinect.Joint joint)
     {
-        float z = Mirrored ? joint.Position.Z * 10 : ((-joint.Position.Z * 10) + ZOffset);
-        return new Vector3(joint.Position.X * 10, joint.Position.Y * 10, z);
+        float z = Mirrored ? joint.Position.Z * 20 : ((-joint.Position.Z * 20) + ZOffset);
+        return new Vector3(joint.Position.X * 20, joint.Position.Y * 20, z);
     }
 }
