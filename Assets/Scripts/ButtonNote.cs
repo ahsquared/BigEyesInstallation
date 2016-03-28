@@ -9,8 +9,6 @@ public class ButtonNote : MonoBehaviour {
     private bool _playing = false;
     private string _colliderName;
     private Bounds _bounds;
-    private Material _mat;
-    private Color _originalColor;
 
     public string OscMessagePath = "/be/track/tx/notes/vel";
     [Range (56, 95)]
@@ -24,17 +22,12 @@ public class ButtonNote : MonoBehaviour {
     private InstrumentState _instrumentState;
     private float _trackNumber;
 
-    private LightingControl[] _spotLights;
-    private LeapingHill[] _leapingHills;
 
     void Start()
     {
         if (!_oscOut) _oscOut = GameObject.Find("OSC").GetComponent<OscOut>();
         if (!_instrumentState) _instrumentState = GameObject.Find("InstrumentUI").GetComponent<InstrumentState>();
-        _mat = gameObject.GetComponent<Renderer>().material;
         _bounds = gameObject.GetComponent<Renderer>().bounds;
-        _spotLights = GameObject.Find("SpotLights").GetComponentsInChildren<LightingControl>();
-        _leapingHills = GameObject.Find("Hills").GetComponentsInChildren<LeapingHill>();
     }
 
 
@@ -46,11 +39,6 @@ public class ButtonNote : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
 
-        //if ((other.name == "HandLeft" || other.name == "HandRight" ||
-        //    other.name == "WristLeft" || other.name == "WristRight" ||
-        //    other.name == "ThumbLeft" || other.name == "ThumbRight" ||
-        //    other.name == "HandTipLeft" || other.name == "HandTipRight") && !playing)
-        //{
         if ((other.name == "HandLeft" || other.name == "HandRight") && !_playing)
         { 
             //Debug.Log("piano note played: " + gameObject.name);
@@ -61,32 +49,11 @@ public class ButtonNote : MonoBehaviour {
 
             //SendOscControllerValue("/be/track/5/mod", other.GetComponent<Rigidbody>().velocity.magnitude > 10 ? 127 : 0);
 
-           _originalColor = _mat.color;
-           _mat.color = new Color(255f, 0f, 0f);
            SendAllControllerMessages(MaxVal);
             _trackNumber = _instrumentState.TrackNumber;
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture));
             SendNote(msgPath, Note, NoteVelocity);
 
-            // Spike the lights
-//            foreach (LightingControl spotlight in _spotLights)
-//            {
-//                spotlight.SpikeLight();
-//            }
-            // Randomly pick a light to spike
-            int lightIndex = Random.Range(0, _spotLights.Length);
-            _spotLights[lightIndex].SpikeLight();
-
-            // make the hills leap
-            //            foreach (LeapingHill leapingHill in _leapingHills)
-            //            {
-            //                leapingHill.SpikeHill();
-            //            }
-            int hillIndex = Random.Range(0, _leapingHills.Length);
-            _leapingHills[hillIndex].SpikeHill();
-
-            // Fire a burst of particles
-            gameObject.GetComponent<ParticleSystem>().Emit(20);
         }
     }
     void OnTriggerStay(Collider other)
@@ -106,7 +73,6 @@ public class ButtonNote : MonoBehaviour {
         if ((other.name == _colliderName) && _playing)
         {
             _playing = false;
-            _mat.color = _originalColor;
             _trackNumber = _instrumentState.TrackNumber;
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture));
             SendNote(msgPath, Note, 0);

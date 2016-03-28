@@ -14,7 +14,7 @@ public class LightingControl : MonoBehaviour {
     {
         _light = gameObject.GetComponent<Light>();
         iTween.Init(gameObject);
-        SpikeLight();
+        //SpikeLight();
     }
 
     // Update is called once per frame
@@ -23,11 +23,20 @@ public class LightingControl : MonoBehaviour {
 
     }
 
-    public void SpikeLight()
+    public void TweenLightIntensity(float currentIntensity, float newIntensity, string onComplete)
     {
         iTween.Stop(gameObject);
-        iTween.ValueTo(gameObject, iTween.Hash("from", _intensity, "to", _intensity + _intensityJump, "time", _spikeUpTime, "onUpdate", "SetLightIntensity", "onComplete", "ResetIntensity"));
+        iTween.ValueTo(gameObject, iTween.Hash("from", currentIntensity, "to", newIntensity, "time", _spikeUpTime, "onUpdate", "SetLightIntensity", "onComplete", onComplete));
+    }
+    public void TweenLightIntensity(float currentIntensity, float newIntensity)
+    {
+        iTween.Stop(gameObject);
+        iTween.ValueTo(gameObject, iTween.Hash("from", currentIntensity, "to", newIntensity, "time", _spikeUpTime, "onUpdate", "SetLightIntensity"));
+    }
 
+    public void SpikeLight()
+    {
+        TweenLightIntensity(_intensity, _intensity + _intensityJump, "ResetIntensity");
     }
 
     private void SetLightIntensity(float value)
@@ -37,7 +46,7 @@ public class LightingControl : MonoBehaviour {
 
     private void ResetIntensity()
     {
-        iTween.ValueTo(gameObject, iTween.Hash("from", _intensity + _intensityJump, "to", _intensity, "time", _spikeDownTime, "onUpdate", "SetLightIntensity"));
+        TweenLightIntensity(_intensity + _intensityJump, _intensity);
 
     }
 }

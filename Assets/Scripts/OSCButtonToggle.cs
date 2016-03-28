@@ -8,6 +8,9 @@ using UnityEngine.UI;
 public class OSCButtonToggle : MonoBehaviour
 {
 
+    public bool IsRecordButton = false;
+    
+
     private OscOut _oscOut;
     public string OscMessagePath;
     public float OffValue = 0f;
@@ -23,7 +26,6 @@ public class OSCButtonToggle : MonoBehaviour
     private Color _activeColor = new Color(33f / 255f, 77f / 255f, 178f / 255f);
     private Image _image;
     private GameObject _imageActive;
-    private GameObject _text;
 
     private LightingControl[] _spotLights;
 
@@ -33,9 +35,7 @@ public class OSCButtonToggle : MonoBehaviour
         if (!_instrumentState) _instrumentState = GameObject.Find("InstrumentUI").GetComponent<InstrumentState>();
         _image = Helpers.GetChildGameObjectByName(gameObject, "Image").GetComponent<Image>();
         _imageActive = Helpers.GetChildGameObjectByName(gameObject, "ImageActive");
-        _text = Helpers.GetChildGameObjectByName(gameObject, "Text");
         if (_imageActive) _imageActive.SetActive(false);
-        if (_text) _text.SetActive(false);
         _originalColor = _image.color;
         _spotLights = GameObject.Find("SpotLights").GetComponentsInChildren<LightingControl>();
     }
@@ -48,10 +48,7 @@ public class OSCButtonToggle : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if ((other.name == "HandLeft" || other.name == "HandRight" ||
-            other.name == "WristLeft" || other.name == "WristRight" ||
-            other.name == "ThumbLeft" || other.name == "ThumbRight" ||
-            other.name == "HandTipLeft" || other.name == "HandTipRight") && !_debouncing)
+        if ((other.name == "HandLeft" || other.name == "HandRight") && !_debouncing)
         {
             _toggleState = !_toggleState;
             float value = _toggleState ? OnValue : OffValue;
@@ -60,25 +57,27 @@ public class OSCButtonToggle : MonoBehaviour
             SendOsc(msgPath, value);
             _debouncing = true;
             _debouncingWait = true;
-            _image.color = _toggleState ? _activeColor : _originalColor;
-            _imageActive.SetActive(_toggleState);
-            _text.SetActive(_toggleState);
+            SetButtonState(_toggleState);
             StartCoroutine("Debounce");
             Debug.Log("send osc to: " + OscMessagePath + ", val: " + value);
 
             // Fire a burst of particles
             gameObject.GetComponent<ParticleSystem>().Emit(20);
 
-            // Spike the lights
-            foreach (LightingControl spotlight in _spotLights)
-            {
-                spotlight.SpikeLight();
-            }
-
             _imageActive.SetActive(_toggleState);
-
+            if (IsRecordButton)
+            {
+                _instrumentState.UpdateRecordCounter(true);
+            }
         }
     }
+
+    public void SetButtonState(bool state)
+    {
+        _image.color = state ? _activeColor : _originalColor;
+        _imageActive.SetActive(state);
+    }
+
 
 //    void OnTriggerExit(Collider other)
 //    {
