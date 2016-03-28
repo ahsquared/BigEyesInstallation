@@ -12,7 +12,8 @@ public class AppManager : MonoBehaviour {
 	void Update () {
 	    if (Input.GetKey("escape"))
 	    {
-	        Application.Quit();
+            _oscOut.Send("/be/play", 0f);
+            Application.Quit();
 	    }
 	}
 

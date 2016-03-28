@@ -13,6 +13,7 @@ public class ClearAll : MonoBehaviour {
     void Start () {
         _instruments = GameObject.Find("Instruments").GetComponentsInChildren<SetTrackNumber>();
         _button = gameObject.GetComponent<OscButtonPush>();
+        ClearAllLoops();
     }
 	
 	// Update is called once per frame
