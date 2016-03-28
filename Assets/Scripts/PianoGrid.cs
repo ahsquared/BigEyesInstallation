@@ -10,7 +10,10 @@ public class PianoGrid : MonoBehaviour {
     public float ArcAngle = 40f; // arc degrees
     public float ArcRadius = 30f;
     public float ArcRadiusOffset = 4f;
+    public float YStaggerFactor = 3f;
+    public bool StaggeredHeight;
     public Vector3 TriggerSize = new Vector3(3f, 5f, 3f);
+    public Vector3 TriggerRotation = new Vector3(-90f, -90f, 0f);
     private List<GameObject> _pianoKeys = new List<GameObject>();
 
     private int[] _diatonicNotes = new int[] {
@@ -44,7 +47,7 @@ public class PianoGrid : MonoBehaviour {
             {
                 x = (-radius * Mathf.Cos(((angleIncrement * col) + angleOffset) * (Mathf.PI / 180))),
                 z = (radius * Mathf.Sin(((angleIncrement * col) + angleOffset) * (Mathf.PI / 180))),
-                y = yPos + (Mathf.Floor(i / numColumns)) * 3f
+                y = yPos + (Mathf.Floor(i / numColumns)) * YStaggerFactor
             };
         }
         return pointsOnArc;
@@ -69,15 +72,23 @@ public class PianoGrid : MonoBehaviour {
 
     void GeneratePianoGridOnArc(int numKeys, int numColumns, float arcAngle, float arcRadius, float arcRadiusOffset)
     {
-        Quaternion keyRotation = Quaternion.AngleAxis(320f, Vector3.right);
         Vector3[] keyPoints = GetPointsOnArc(numKeys, numColumns, arcAngle, arcRadius, arcRadiusOffset, 0, 73f);
         for (int i = 0; i < numKeys; i++)
         {
             Vector3 initPos = new Vector3(keyPoints[i].x, keyPoints[i].y, keyPoints[i].z);
             GameObject pianoKey = Instantiate(NoteObject, initPos, Quaternion.identity) as GameObject;
+            int row = (int) Mathf.Floor(i / numColumns);
             _pianoKeys.Add(pianoKey);
-            pianoKey.transform.localScale = TriggerSize;
-            pianoKey.transform.rotation = keyRotation;
+            if (StaggeredHeight)
+            {
+                pianoKey.transform.localScale = new Vector3(TriggerSize.x * (1 + row * 0.2f),
+                    TriggerSize.y * (1 + row * 0.2f), TriggerSize.z * (1 + row * 1f));
+            }
+            else
+            {
+                pianoKey.transform.localScale = TriggerSize;
+            }
+            pianoKey.transform.Rotate(TriggerRotation, Space.Self);
             pianoKey.name = "pianoKey " + i;
             pianoKey.transform.parent = gameObject.transform;
             pianoKey.GetComponent<ButtonNote>().Note = _diatonicNotes[i];
