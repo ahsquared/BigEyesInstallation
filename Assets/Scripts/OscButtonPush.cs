@@ -10,6 +10,9 @@ public class OscButtonPush : MonoBehaviour {
     public string OscMessagePath;
     public float OffValue = 0f;
     public float OnValue = 1f;
+
+    public bool IsClearButton;
+
     private bool _pushed = false;
     private string _colliderName;
 
@@ -46,7 +49,7 @@ public class OscButtonPush : MonoBehaviour {
         {
             _pushed = true;
             _colliderName = other.name;
-            _trackNumber = _instrumentState.TrackNumber;
+            _trackNumber = _instrumentState.TrackNumber + ((_instrumentState.SetNumber - 1) * 4);
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture)).Replace("lx", 1.ToString(CultureInfo.CurrentCulture));
             SendOsc(msgPath, OnValue);
             _image.color = _activeColor;
@@ -57,6 +60,10 @@ public class OscButtonPush : MonoBehaviour {
             gameObject.GetComponent<ParticleSystem>().Emit(20);
 
             //Debug.Log("send osc to: " + msgPath + ", val: " + OnValue);
+            if (IsClearButton)
+            {
+                _instrumentState.UpdateRecordCounter(false);
+            }
         }
     }
     void OnTriggerExit(Collider other)
@@ -65,7 +72,7 @@ public class OscButtonPush : MonoBehaviour {
         if ((other.name == _colliderName) && _pushed)
         {
             _pushed = false;
-            _trackNumber = _instrumentState.TrackNumber;
+            _trackNumber = _instrumentState.TrackNumber + ((_instrumentState.SetNumber - 1) * 4);
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture)).Replace("lx", 1.ToString(CultureInfo.CurrentCulture));
             SendOsc(msgPath, OffValue);
             _image.color = _originalColor;

@@ -14,6 +14,7 @@ public class PianoGrid : MonoBehaviour {
     public bool StaggeredHeight;
     public Vector3 TriggerSize = new Vector3(3f, 5f, 3f);
     public Vector3 TriggerRotation = new Vector3(-90f, -90f, 0f);
+    public Vector3 GridPosition = new Vector3(-1f, -6, -17f);
     private List<GameObject> _pianoKeys = new List<GameObject>();
 
     private int[] _diatonicNotes = new int[] {
@@ -91,13 +92,15 @@ public class PianoGrid : MonoBehaviour {
             pianoKey.transform.Rotate(TriggerRotation, Space.Self);
             pianoKey.name = "pianoKey " + i;
             pianoKey.transform.parent = gameObject.transform;
+            pianoKey.GetComponent<BoxCollider>().size = new Vector3(1f, 1f, 2f);
+            pianoKey.GetComponent<BoxCollider>().center = new Vector3(0f, 0f, 0.5f);
             pianoKey.GetComponent<ButtonNote>().Note = _diatonicNotes[i];
-            pianoKey.GetComponent<ButtonNote>().OscControllerMessages = new string[2];
+            pianoKey.GetComponent<ButtonNote>().OscControllerMessages = new string[1];
             pianoKey.GetComponent<ButtonNote>().OscControllerMessages[0] = "/be/track/tx/fx/1";
-            pianoKey.GetComponent<ButtonNote>().OscControllerMessages[1] = "/be/track/tx/fx/2";
+            //pianoKey.GetComponent<ButtonNote>().OscControllerMessages[1] = "/be/track/tx/fx/2";
 
         }
-        gameObject.transform.position = new Vector3(-1f, -6, -17f);
+        gameObject.transform.position = GridPosition;
         //Quaternion gridRotation = Quaternion.AngleAxis(320f, Vector3.right);
         //gameObject.transform.rotation = gridRotation;
     }

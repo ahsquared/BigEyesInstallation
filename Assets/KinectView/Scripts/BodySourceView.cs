@@ -10,9 +10,13 @@ public class BodySourceView : MonoBehaviour
 {
     public GameObject MainCamera;
 
+    private AVProMovieCaptureFromScene _movieCapture;
+    public bool RecordEnabled = false;
     public Material HandMaterial;
     public GameObject ParticleSystem;
     public GameObject BodySourceManager;
+
+    private ShowInstructions _showInstructions;
 
     private OSCController _oscControl;
 
@@ -59,6 +63,8 @@ public class BodySourceView : MonoBehaviour
     /// </summary>
     private ulong _currentTrackingId = 0;
 
+    private bool _isPlaying;
+
     private Dictionary<Kinect.JointType, Kinect.JointType> _boneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
         { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
@@ -92,11 +98,12 @@ public class BodySourceView : MonoBehaviour
 
     };
 
-   
 
     void Start()
     {
-       if (!_oscControl) _oscControl = GameObject.Find("OSC").GetComponent<OSCController>();
+        if (!_oscControl) _oscControl = GameObject.Find("OSC").GetComponent<OSCController>();
+        if (!_movieCapture)  _movieCapture = GameObject.Find("Main Camera").GetComponent<AVProMovieCaptureFromScene>();
+        if (!_showInstructions) _showInstructions = GameObject.Find("Instructions").GetComponent<ShowInstructions>();
         _jointScaleFactor = BaseScaleFactor;
     }
 
@@ -139,6 +146,18 @@ public class BodySourceView : MonoBehaviour
 
         if (closestBody == null)
         {
+            // stop playback if no users
+            if (_isPlaying)
+            {
+                _oscControl.SendOSC("/be/play", 0);
+                _isPlaying = false;
+                if (RecordEnabled)
+                {
+                    _movieCapture.StopCapture();
+                }
+            }
+            // hide Instructions
+            _showInstructions.HideInstructions();
             return;
         }
 
@@ -163,9 +182,21 @@ public class BodySourceView : MonoBehaviour
             if (!_bodies.ContainsKey(closestBody.TrackingId))
             {
                 _bodies[closestBody.TrackingId] = CreateHands(closestBody, closestBody.TrackingId);
-                _oscControl.SendOSC("/be/play", 1f);
-                OSCButtonToggle playButton = GameObject.Find("Play").GetComponent<OSCButtonToggle>();
-                playButton.SetButtonState(true);
+                _showInstructions.FadeInInstructions();
+                if (!_isPlaying)
+                {
+                    _oscControl.SendOSC("/be/play", 1f);
+                    _isPlaying = true;
+
+                    if (RecordEnabled)
+                    {
+                        // start recording a movie clip
+                        _movieCapture.StopCapture(); // in case a recording is already happening
+                        _movieCapture.StartCapture();
+                    }
+                }
+//                OSCButtonToggle playButton = GameObject.Find("Play").GetComponent<OSCButtonToggle>();
+//                playButton.SetButtonState(true);
             }
 
             RefreshHands(closestBody, _bodies[closestBody.TrackingId], (long) closestBody.TrackingId);
@@ -433,6 +464,10 @@ public class BodySourceView : MonoBehaviour
 
     private void RefreshHands(Kinect.Body body, GameObject bodyObject, long trackingId)
     {
+
+        _maxHeight = (GetVector3FromJoint(body.Joints[Kinect.JointType.Head]) - GetVector3FromJoint(body.Joints[Kinect.JointType.FootLeft])).sqrMagnitude;
+
+        _jointScaleFactor = BaseScaleFactor * (1000 / _maxHeight);
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {

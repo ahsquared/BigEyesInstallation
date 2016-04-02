@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Globalization;
+using UnityEngine.SceneManagement;
 
 public class ClearAll : MonoBehaviour {
 
@@ -8,12 +9,14 @@ public class ClearAll : MonoBehaviour {
     private OscButtonPush _button;
     private bool _pushed = false;
     private string _colliderName;
+    private ButtonNote[] _buttonNotes;
 
     // Use this for initialization
     void Start () {
         _instruments = GameObject.Find("Instruments").GetComponentsInChildren<SetTrackNumber>();
         _button = gameObject.GetComponent<OscButtonPush>();
-        ClearAllLoops();
+        _buttonNotes = GameObject.Find("PianoGrid").GetComponentsInChildren<ButtonNote>();
+        ClearAllLoops(false);
     }
 	
 	// Update is called once per frame
@@ -27,7 +30,7 @@ public class ClearAll : MonoBehaviour {
         {
             _pushed = true;
             _colliderName = other.name;
-            ClearAllLoops();
+            ClearAllLoops(true);
         }
     }
     void OnTriggerExit(Collider other)
@@ -38,13 +41,22 @@ public class ClearAll : MonoBehaviour {
             _pushed = false;
         }
     }
-    public void ClearAllLoops()
+    public void ClearAllLoops(bool reset)
     {
         foreach (SetTrackNumber instrument in _instruments)
         {
-            string msgPath = _button.OscMessagePath.Replace("tx", instrument.TrackNumber.ToString(CultureInfo.CurrentCulture)).Replace("lx", 1.ToString(CultureInfo.CurrentCulture));
-            _button.SendOsc(msgPath, 1f);
-            Debug.Log("Send OSC to: " + msgPath + " with value " + 1);
+            instrument.ClearLoop();
         }
+
+        // reset all button highlights
+        foreach (var button in _buttonNotes)
+        {
+            button.GetComponent<HighlightButton>().UnHighlightButton();
+        }
+
+//        if (reset)
+//        {
+//            SceneManager.LoadScene(0);
+//        }
     }
 }

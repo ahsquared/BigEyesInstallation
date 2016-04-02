@@ -15,7 +15,7 @@ public class AppManager : MonoBehaviour {
 	    if (Input.GetKey("escape"))
 	    {
             _oscOut.Send("/be/play", 0f);
-            _clearAll.ClearAllLoops();
+            _clearAll.ClearAllLoops(false);
             Application.Quit();
 	    }
 	}

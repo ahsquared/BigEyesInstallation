@@ -10,14 +10,19 @@ public class HighlightButton : MonoBehaviour {
     private Color _secondaryOriginalColor;
     private string _primaryColorName = "_PrimaryColor";
     private string _secondaryColorName = "_SecondaryColor";
-    private Light _light;
+    public Light FlareLight;
 
-    // Use this for initialization
-    void Start () {
+    void Awake()
+    {
         _mat = gameObject.GetComponent<Renderer>().material;
         _primaryOriginalColor = _mat.GetColor(_primaryColorName);
         _secondaryOriginalColor = _mat.GetColor(_secondaryColorName);
-        if (!_light) _light = gameObject.GetComponent<Light>();
+        if (!FlareLight) FlareLight = gameObject.GetComponent<Light>();
+    }
+
+    // Use this for initialization
+    void Start () {
+       
     }
 	
 	// Update is called once per frame
@@ -44,7 +49,7 @@ public class HighlightButton : MonoBehaviour {
             _mat.SetColor(_secondaryColorName, new Color(255f, 0f, 216f));
 
             // turn on flare
-            _light.intensity = 0.2f;
+            FlareLight.intensity = 0.2f;
 
             // Fire a burst of particles
             gameObject.GetComponent<ParticleSystem>().Emit(20);
@@ -56,10 +61,15 @@ public class HighlightButton : MonoBehaviour {
 
         if ((other.name == _colliderName) && _playing)
         {
-            _playing = false;
-            _mat.SetColor(_primaryColorName, _primaryOriginalColor);
-            _mat.SetColor(_secondaryColorName, _secondaryOriginalColor);
-            _light.intensity = 0f;
+            UnHighlightButton();
         }
+    }
+
+    public void UnHighlightButton()
+    {
+        _playing = false;
+        _mat.SetColor(_primaryColorName, _primaryOriginalColor);
+        _mat.SetColor(_secondaryColorName, _secondaryOriginalColor);
+        FlareLight.intensity = 0f;
     }
 }

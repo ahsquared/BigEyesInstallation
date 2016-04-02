@@ -17,16 +17,21 @@ public class ButtonNote : MonoBehaviour {
     //private float velocityF;
     public string[] OscControllerMessages;
     [Range(0f, 1f)]
-    public float MaxVal = 0.8f;
+    public float MaxVal = 1f;
 
     private InstrumentState _instrumentState;
     private float _trackNumber;
 
+    private HighlightButton _highlight;
 
-    void Start()
+    void Awake()
     {
         if (!_oscOut) _oscOut = GameObject.Find("OSC").GetComponent<OscOut>();
         if (!_instrumentState) _instrumentState = GameObject.Find("InstrumentUI").GetComponent<InstrumentState>();
+        if (!_highlight) _highlight = gameObject.GetComponent<HighlightButton>();
+    }
+    void Start()
+    {
         _bounds = gameObject.GetComponent<Renderer>().bounds;
     }
 
@@ -50,7 +55,7 @@ public class ButtonNote : MonoBehaviour {
             //SendOscControllerValue("/be/track/5/mod", other.GetComponent<Rigidbody>().velocity.magnitude > 10 ? 127 : 0);
 
            SendAllControllerMessages(MaxVal);
-            _trackNumber = _instrumentState.TrackNumber;
+            _trackNumber = _instrumentState.TrackNumber + ((_instrumentState.SetNumber - 1) * 4);
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture));
             SendNote(msgPath, Note, NoteVelocity);
 
@@ -63,7 +68,11 @@ public class ButtonNote : MonoBehaviour {
             float maxHeight = _bounds.max.y;
             float minHeight = _bounds.min.y;
             float handY = other.transform.position.y;
-            float value = ((handY + maxHeight) / (maxHeight - minHeight)) * MaxVal;
+            float value = ((handY - minHeight) / (maxHeight - minHeight)) * MaxVal;
+
+            // turn on flare
+            _highlight.FlareLight.intensity = 0.2f - (value * 0.2f);
+
             SendAllControllerMessages(value);
         }
     }
@@ -73,7 +82,7 @@ public class ButtonNote : MonoBehaviour {
         if ((other.name == _colliderName) && _playing)
         {
             _playing = false;
-            _trackNumber = _instrumentState.TrackNumber;
+            _trackNumber = _instrumentState.TrackNumber + ((_instrumentState.SetNumber - 1) * 4);
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture));
             SendNote(msgPath, Note, 0);
         }
@@ -83,7 +92,7 @@ public class ButtonNote : MonoBehaviour {
     {
         foreach (string message in OscControllerMessages)
         {
-            //SendOscControllerValue(message.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture)), value);
+            SendOscControllerValue(message.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture)), value);
         }
     }
 

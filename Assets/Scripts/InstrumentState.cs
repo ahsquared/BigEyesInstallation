@@ -13,6 +13,7 @@ namespace BigEyes
     public class InstrumentState : MonoBehaviour
     {
 
+        public int SetNumber = 1;
         public int TrackNumber = 1;
         public bool RecordEnabled = false;
         public OscIn OscIn;
@@ -30,6 +31,11 @@ namespace BigEyes
         public Light[] Suns;
         private float _lightUpdateTime = 0.5f;
 
+        void Awake()
+        {
+            Suns = GameObject.Find("Suns").GetComponentsInChildren<Light>();
+        }
+
         // Use this for initialization
         void Start()
         {
@@ -41,8 +47,6 @@ namespace BigEyes
 
             // init record loops counter
             _loopStates = new List<int>(Enumerable.Repeat(0, NumConcurrentInstruments));
-
-            Suns = GameObject.Find("Suns").GetComponentsInChildren<Light>();
 
             SetSunStates();
         }
@@ -106,6 +110,20 @@ namespace BigEyes
             else
             {
                 _loopStates[(int)TrackNumber % 4] = 0;
+            }
+            SetSunStates();
+        }
+
+        public void ResetRecordCounter()
+        {
+            if (_loopStates == null)
+            {
+                // init record loops counter
+                _loopStates = new List<int>(Enumerable.Repeat(0, NumConcurrentInstruments));
+            }
+            for (int index = 0; index < _loopStates.Count; index++)
+            {
+                _loopStates[index] = 0;
             }
             SetSunStates();
         }

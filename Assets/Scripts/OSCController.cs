@@ -45,6 +45,13 @@ namespace BigEyes
             SendOSC("/be/track/3/loop/1/length", 0.2f);
             SendOSC("/be/track/4/loop/1/length", 0.2f);
             SendOSC("/be/track/5/loop/1/length", 0.2f);
+            SendOSC("/be/track/6/loop/1/length", 0.2f);
+            SendOSC("/be/track/7/loop/1/length", 0.2f);
+            SendOSC("/be/track/8/loop/1/length", 0.2f);
+            SendOSC("/be/track/9/loop/1/length", 0.2f);
+            SendOSC("/be/track/10/loop/1/length", 0.2f);
+            SendOSC("/be/track/11/loop/1/length", 0.2f);
+            SendOSC("/be/track/12/loop/1/length", 0.2f);
         }
 
 

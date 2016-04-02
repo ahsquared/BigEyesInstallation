@@ -52,7 +52,7 @@ public class OSCButtonToggle : MonoBehaviour
         {
             _toggleState = !_toggleState;
             float value = _toggleState ? OnValue : OffValue;
-            _trackNumber = _instrumentState.TrackNumber;
+            _trackNumber = _instrumentState.TrackNumber + ((_instrumentState.SetNumber - 1) * 4);
             string msgPath = OscMessagePath.Replace("tx", _trackNumber.ToString(CultureInfo.CurrentCulture)).Replace("lx", 1.ToString(CultureInfo.CurrentCulture));
             SendOsc(msgPath, value);
             _debouncing = true;

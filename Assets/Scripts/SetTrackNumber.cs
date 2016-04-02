@@ -12,8 +12,9 @@ public class SetTrackNumber : MonoBehaviour
     public bool TrackActive;
     public bool IsChromatic;
 
-    private InstrumentState _instrumentState;
+    public InstrumentState InstrumentState;
     private SetTrackNumber[] _instruments;
+    private SetSoundSetNumber[] _soundSets;
     private Color _originalColor;
     private Color _activeColor = new Color(33f / 255f, 77f / 255f, 178f / 255f);
 
@@ -30,13 +31,18 @@ public class SetTrackNumber : MonoBehaviour
 
     private PianoGrid _pianoGrid;
 
-    // Use this for initialization
-    void Start () {
-        if (!_instrumentState) _instrumentState = GameObject.Find("InstrumentUI").GetComponent<InstrumentState>();
-        if (!_recordButton) _recordButton = GameObject.Find("Record").GetComponent<OSCButtonToggle>();
-        if (!_pianoGrid) _pianoGrid = GameObject.Find("PianoGrid").GetComponent<PianoGrid>();
+    void Awake()
+    {
+        if (!InstrumentState) InstrumentState = GameObject.Find("InstrumentUI").GetComponent<InstrumentState>();
         if (!_oscController) _oscController = GameObject.Find("OSC").GetComponent<OSCController>();
         _instruments = GameObject.Find("Instruments").GetComponentsInChildren<SetTrackNumber>();
+        _soundSets = GameObject.Find("Sets").GetComponentsInChildren<SetSoundSetNumber>();
+    }
+
+    // Use this for initialization
+    void Start () {
+        if (!_recordButton) _recordButton = GameObject.Find("Record").GetComponent<OSCButtonToggle>();
+        if (!_pianoGrid) _pianoGrid = GameObject.Find("PianoGrid").GetComponent<PianoGrid>();
         _image = Helpers.GetChildGameObjectByName(gameObject, "Image").GetComponent<Image>();
         _imageInactive = Helpers.GetChildGameObjectByName(gameObject, "Image");
         _imageActive = Helpers.GetChildGameObjectByName(gameObject, "ImageActive");
@@ -66,16 +72,19 @@ public class SetTrackNumber : MonoBehaviour
             SetTrackState(true);
 
             // if track number changed stop recording reset record button
-            if (_instrumentState.TrackNumber != TrackNumber)
+            if (InstrumentState.TrackNumber != TrackNumber)
             {
                 _recordButton.SetButtonState(false);
                 foreach (SetTrackNumber instrument in _instruments)
                 {
-                    string trackNumber = instrument.TrackNumber.ToString(CultureInfo.CurrentCulture);
-                    string msgPath = _recordButton.OscMessagePath.Replace("tx", trackNumber).Replace("lx", 1.ToString(CultureInfo.CurrentCulture));
-                    _recordButton.SendOsc(msgPath, 0f);
-                    // send Stop All Notes MIDI CC (Panic button) to prevent stuck notes
-                    instrument.SendPanic();
+                    foreach (SetSoundSetNumber set in _soundSets)
+                    {
+                        string trackNumber = (instrument.TrackNumber + ((set.SetNumber - 1) * 4)).ToString(CultureInfo.CurrentCulture);
+                        string msgPath = _recordButton.OscMessagePath.Replace("tx", trackNumber).Replace("lx", 1.ToString(CultureInfo.CurrentCulture));
+                        _recordButton.SendOsc(msgPath, 0f);
+                        // send Stop All Notes MIDI CC (Panic button) to prevent stuck notes
+                        instrument.SendPanic(trackNumber);
+                    }
                 }
 
                 
@@ -90,14 +99,29 @@ public class SetTrackNumber : MonoBehaviour
                 _pianoGrid.UpdateNotes(false);
             }
 
-            _instrumentState.TrackNumber = TrackNumber;
+            InstrumentState.TrackNumber = TrackNumber;
+
+            // Fire a burst of particles
+            gameObject.GetComponent<ParticleSystem>().Emit(20);
         }
     }
 
-    public void SendPanic()
+    public void SendPanic(string trackNumber)
     {
-        _oscController.SendOSC("/be/track/" + TrackNumber + "/panic", 1);
-        _oscController.SendOSC("/be/track/" + TrackNumber + "/panic", 0);
+        _oscController.SendOSC("/be/track/" + trackNumber + "/panic", 1);
+        _oscController.SendOSC("/be/track/" + trackNumber + "/panic", 0);
+    }
+
+    public void ClearLoop()
+    {
+        foreach (SetSoundSetNumber set in _soundSets)
+        {
+            _oscController.SendOSC(
+                "/be/track/" + (TrackNumber + ((set.SetNumber - 1) * 4)) + "/loop/1/clear", 1);
+            _oscController.SendOSC(
+                "/be/track/" + (TrackNumber + ((set.SetNumber - 1) * 4)) + "/loop/1/clear", 0);
+        }
+        InstrumentState.ResetRecordCounter();
     }
 
     public void SetTrackState(bool state)
